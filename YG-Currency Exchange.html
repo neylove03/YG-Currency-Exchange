@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบคำนวณราคาเงิน M และไอเทมเกมโยกัง (Yulgang Online Calculator)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Kanit & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Kanit', 'sans-serif'],
+                    },
+                    colors: {
+                        yg: {
+                            gold: '#fbbf24',
+                            amber: '#f59e0b',
+                            red: '#ef4444',
+                            blue: '#3b82f6',
+                            card: '#1e293b'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #0b0f19;
+            color: #f8fafc;
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 215, 0, 0.12);
+        }
+        .preset-btn.active {
+            background-color: #d97706;
+            color: #ffffff;
+            border-color: #fbbf24;
+            box-shadow: 0 0 14px rgba(245, 158, 11, 0.4);
+        }
+        .item-chip {
+            transition: all 0.2s ease;
+        }
+        .item-chip:hover {
+            border-color: #fbbf24;
+            transform: translateY(-1px);
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b0f19;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-12">
+
+    <!-- Top Navigation Header -->
+    <header class="border-b border-amber-500/20 bg-slate-900/90 sticky top-0 z-50 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-amber-500 via-orange-500 to-yellow-400 flex items-center justify-center shadow-lg shadow-amber-500/20 ring-2 ring-amber-400/30">
+                    <i class="fa-solid font-bold fa-dragon text-slate-950 text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold bg-gradient-to-r from-amber-300 via-yellow-200 to-white bg-clip-text text-transparent flex items-center gap-2">
+                        Yulgang Currency Calculator
+                        <span class="text-xs px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 font-normal">โยกัง ออนไลน์</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">คำนวณและปรับเทียบราคาเงิน M / ขายไอเทมโยกังเมื่อเกิดภาวะเงินเฟ้อ</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2 text-xs bg-slate-800/90 px-3.5 py-2 rounded-xl border border-amber-500/30">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span class="text-slate-300">สูตรคำนวณ: <strong class="text-amber-400">1 บาท = (1,000,000 ÷ เรทเงิน M) สลึงในเกม</strong></span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 space-y-8">
+
+        <!-- SECTION 1: SETTINGS PANEL -->
+        <section class="glass-card rounded-2xl p-6 shadow-xl relative overflow-hidden">
+            <div class="absolute -top-24 -right-24 w-60 h-60 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                <div>
+                    <h2 class="text-lg font-semibold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-coins text-amber-400"></i>
+                        ตั้งค่าอัตราแลกเปลี่ยนเงิน M โยกัง (1M = กี่บาท?)
+                    </h2>
+                    <p class="text-sm text-slate-400">เลือกราคาเรทเงิน M ปัจจุบันของคุณ เพื่ออัปเดตราคาตั้งขายไอเทมทั้งระบบ</p>
+                </div>
+                
+                <!-- Custom Input -->
+                <div class="flex items-center space-x-2 bg-slate-900/90 p-1.5 rounded-xl border border-slate-700 focus-within:border-amber-500 transition-colors">
+                    <label for="customRate" class="text-xs text-slate-400 pl-2">เรทเงิน M:</label>
+                    <input type="number" id="customRate" value="25" min="0.1" step="0.5" 
+                        class="w-24 bg-slate-800 text-amber-400 font-bold text-center py-1.5 px-2 rounded-lg border border-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm">
+                    <span class="text-xs font-semibold text-slate-300 pr-2">บาท / 1M</span>
+                </div>
+            </div>
+
+            <!-- Preset Buttons Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-2.5">
+                <button onclick="window.setRate(25)" class="preset-btn active py-2.5 px-3 rounded-xl border border-slate-700 bg-slate-800/80 hover:bg-slate-700 transition font-medium text-sm flex flex-col items-center justify-center">
+                    <span class="text-xs text-slate-400">เรทปกติ</span>
+                    <span class="font-bold">25 บาท</span>
+                </button>
+                <button onclick="window.setRate(24)" class="preset-btn py-2.5 px-3 rounded-xl border border-slate-700 bg-slate-800/80 hover:bg-slate-700 transition font-medium text-sm flex flex-col items-center justify-center">
+                    <span class="text-xs text-slate-400">เฟ้อเล็กน้อย</span>
+                    <span class="font-bold">24 บาท</span>
+                </button>
+                <button onclick="window.setRate(23)" class="preset-btn py-2.5 px-3 rounded-xl border border-slate-700 bg-slate-800/80 hover:bg-slate-700 transition font-medium text-sm flex flex-col items-center justify-center">
+                    <span class="text-xs text-slate-400">เฟ้อเล็กน้อย</span>
+                    <span class="font-bold">23 บาท</span>
+                </button>
+                <button onclick="window.setRate(22)" class="preset-btn py-2.5 px-3 rounded-xl border border-slate-700 bg-slate-800/80 hover:bg-slate-700 transition font-medium text-sm flex flex-col items-center justify-center">
+                    <span class="text-xs text-slate-400">เฟ้อปานกลาง</span>
+                    <span class="font-bold">22 บาท</span>
+                </button>
+                <button onclick="window.setRate(21)" class="preset-btn py-2.5 px-3 rounded-xl border border-slate-700 bg-slate-800/80 hover:bg-slate-700 transition font-medium text-sm flex flex-col items-center justify-center">
+                    <span class="text-xs text-slate-400">เฟ้อปานกลาง</span>
+                    <span class="font-bold">21 บาท</span>
+                </button>
+                <button onclick="window.setRate(20)" class="preset-btn py-2.5 px-3 rounded-xl border border-slate-700 bg-slate-800/80 hover:bg-slate-700 transition font-medium text-sm flex flex-col items-center justify-center">
+                    <span class="text-xs text-slate-400">เงินเฟ้อหนัก</span>
+                    <span class="font-bold">20 บาท</span>
+                </button>
+                <button onclick="window.setRate(15)" class="preset-btn py-2.5 px-3 rounded-xl border border-slate-700 bg-slate-800/80 hover:bg-slate-700 transition font-medium text-sm flex flex-col items-center justify-center">
+                    <span class="text-xs text-slate-400">เฟ้อรุนแรง</span>
+                    <span class="font-bold">15 บาท</span>
+                </button>
+                <button onclick="window.setRate(10)" class="preset-btn py-2.5 px-3 rounded-xl border border-slate-700 bg-slate-800/80 hover:bg-slate-700 transition font-medium text-sm flex flex-col items-center justify-center">
+                    <span class="text-xs text-slate-400">เฟ้อวิกฤต</span>
+                    <span class="font-bold">10 บาท</span>
+                </button>
+            </div>
+
+            <!-- Current Rate Summary Banner -->
+            <div class="mt-5 p-4 rounded-xl bg-slate-900/80 border border-slate-800 flex flex-wrap items-center justify-between gap-4 text-sm">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-circle-info text-amber-400"></i>
+                    <span>สถานะเรทปัจจุบัน: <span class="font-bold text-white">1M (สลึง) = <span id="currentRateDisplay" class="text-amber-400">25</span> บาท</span></span>
+                </div>
+                <div class="flex flex-wrap items-center gap-4 text-xs sm:text-sm">
+                    <span>เงินจริง 1 บาท = <strong class="text-emerald-400" id="thbToOneUnitDisplay">40,000</strong> สลึง</span>
+                    <span class="text-slate-600">|</span>
+                    <span>1,000,000 สลึง = <strong class="text-amber-400" id="oneMToThbDisplay">25</strong> บาท</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: CALCULATORS GRID -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            <!-- CALCULATOR 1: THB -> In-Game Currency -->
+            <div class="glass-card rounded-2xl p-6 shadow-xl flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="p-2.5 rounded-xl bg-amber-500/20 text-amber-400">
+                            <i class="fa-solid fa-calculator text-lg"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg text-white">1. แปลงเงินจริง (บาท) ➔ ราคาขายในโยกัง</h3>
+                            <p class="text-xs text-slate-400">ใส่จำนวนเงินบาทเพื่อดูว่าต้องตั้งขายกี่ M / กี่สลึง</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-1">จำนวนเงินจริง (บาท)</label>
+                            <div class="relative">
+                                <input type="number" id="thbInput" value="2" min="0" step="any"
+                                    class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2.5 px-4 text-white text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500 pr-12">
+                                <span class="absolute right-4 top-3 text-sm text-slate-400">บาท</span>
+                            </div>
+                        </div>
+
+                        <!-- Quick THB buttons -->
+                        <div class="flex flex-wrap gap-2 pt-1">
+                            <button onclick="window.setThbInput(1)" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700">1 บาท</button>
+                            <button onclick="window.setThbInput(2)" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700">2 บาท</button>
+                            <button onclick="window.setThbInput(5)" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700">5 บาท</button>
+                            <button onclick="window.setThbInput(10)" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700">10 บาท</button>
+                            <button onclick="window.setThbInput(50)" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700">50 บาท</button>
+                            <button onclick="window.setThbInput(100)" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700">100 บาท</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Result Box -->
+                <div class="mt-6 p-4 rounded-xl bg-slate-900/90 border border-slate-800 space-y-3">
+                    <div class="text-xs text-slate-400 uppercase tracking-wider font-semibold">ราคาที่ต้องตั้งในเกมโยกัง</div>
+                    <div class="flex items-baseline justify-between">
+                        <span class="text-slate-400 text-sm">จำนวนสลึงเต็ม:</span>
+                        <span class="text-2xl font-extrabold text-emerald-400" id="calc1ResultUnits">80,000</span>
+                    </div>
+                    <div class="flex items-baseline justify-between border-t border-slate-800 pt-2">
+                        <span class="text-slate-400 text-sm">หน่วย M (ล้าน):</span>
+                        <span class="text-xl font-bold text-amber-400" id="calc1ResultM">0.08 M</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CALCULATOR 2: Yulgang Item Pricing Helper -->
+            <div class="glass-card rounded-2xl p-6 shadow-xl flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center space-x-3 mb-3">
+                        <div class="p-2.5 rounded-xl bg-amber-500/20 text-amber-400">
+                            <i class="fa-solid fa-store text-lg"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg text-white">2. คำนวณราคาตั้งขายไอเทมโยกัง</h3>
+                            <p class="text-xs text-slate-400">คลิกเลือกไอเทมตัวอย่าง หรือกำหนดราคา/จำนวนเอง</p>
+                        </div>
+                    </div>
+
+                    <!-- Yulgang Preset Items Buttons -->
+                    <div class="mb-4">
+                        <label class="block text-xs text-slate-400 mb-1.5">ไอเทมยอดนิยมในโยกัง:</label>
+                        <div class="flex flex-wrap gap-1.5">
+                            <button onclick="window.setYulgangItem('ลูกกวาดเหลือง', 2)" class="item-chip px-2.5 py-1 bg-slate-800 rounded-lg text-xs border border-amber-500/30 text-amber-300">
+                                🍬 ลูกกวาดเหลือง (2฿)
+                            </button>
+                            <button onclick="window.setYulgangItem('ลูกกวาดฟ้า', 3)" class="item-chip px-2.5 py-1 bg-slate-800 rounded-lg text-xs border border-amber-500/30 text-sky-300">
+                                🍬 ลูกกวาดฟ้า (3฿)
+                            </button>
+                            <button onclick="window.setYulgangItem('ยาครอบเซียน 1 วัน', 15)" class="item-chip px-2.5 py-1 bg-slate-800 rounded-lg text-xs border border-amber-500/30 text-emerald-300">
+                                💊 ยาครอบเซียน (15฿)
+                            </button>
+                            <button onclick="window.setYulgangItem('ยาเม็ดวิเศษ', 10)" class="item-chip px-2.5 py-1 bg-slate-800 rounded-lg text-xs border border-amber-500/30 text-purple-300">
+                                💊 ยาเม็ดวิเศษ (10฿)
+                            </button>
+                            <button onclick="window.setYulgangItem('หินวิญญาณ', 5)" class="item-chip px-2.5 py-1 bg-slate-800 rounded-lg text-xs border border-amber-500/30 text-rose-300">
+                                💎 หินวิญญาณ (5฿)
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">ชื่อไอเทม</label>
+                            <input type="text" id="itemNameInput" value="ลูกกวาดเหลือง" placeholder="เช่น ลูกกวาดเหลือง, ยาครอบเซียน"
+                                class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-white text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1">มูลค่าเงินจริง/ชิ้น (บาท)</label>
+                                <input type="number" id="itemCostInput" value="2" min="0" step="any"
+                                    class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-white text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1">จำนวนที่ขาย (เม็ด/ชิ้น)</label>
+                                <input type="number" id="itemQtyInput" value="1" min="1" step="1"
+                                    class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-white text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Result Box -->
+                <div class="mt-6 p-4 rounded-xl bg-slate-900/90 border border-amber-500/40 space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-amber-400 font-semibold uppercase tracking-wider">ราคาตั้งขายในเกมโยกัง</span>
+                        <span class="text-xs text-slate-400" id="itemNameDisplay">ลูกกวาดเหลือง (1 ชิ้น)</span>
+                    </div>
+                    <div class="flex items-baseline justify-between">
+                        <span class="text-slate-400 text-sm">ต่อ 1 ชิ้น:</span>
+                        <span class="text-xl font-bold text-amber-400" id="itemUnitPriceDisplay">80,000 (0.08 M)</span>
+                    </div>
+                    <div class="flex items-baseline justify-between border-t border-slate-800 pt-2">
+                        <span class="text-slate-400 text-sm">ราคารวมตั้งขายร้าน:</span>
+                        <span class="text-2xl font-extrabold text-emerald-400" id="itemTotalPriceDisplay">80,000 (0.08 M)</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- SECTION 3: INFLATION COMPARISON FEATURE -->
+        <section class="glass-card rounded-2xl p-6 shadow-xl border-t-4 border-t-amber-500">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                <div>
+                    <h2 class="text-lg font-semibold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-chart-line text-amber-400"></i>
+                        เปรียบเทียบราคาตั้งขายเมื่อเงิน M เฟ้อ (Old Rate vs New Rate)
+                    </h2>
+                    <p class="text-sm text-slate-400">เมื่อเรท M ในตลาดลดลง ต้องปรับราคาขายในเกมเพิ่มขึ้นกี่สลึง/กี่ M เพื่อให้ได้เงินจริงเท่าเดิม</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+                <!-- Inputs -->
+                <div class="space-y-4 bg-slate-900/60 p-4 rounded-xl border border-slate-800">
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">ราคาเงินจริงของไอเทม (บาท)</label>
+                        <input type="number" id="compareThbInput" value="10" min="0" step="any"
+                            class="w-full bg-slate-900 border border-slate-700 rounded-lg py-2 px-3 text-white text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">เรทเดิม (บาท/M)</label>
+                            <input type="number" id="oldRateInput" value="25" min="0.1" step="any"
+                                class="w-full bg-slate-900 border border-slate-700 rounded-lg py-2 px-3 text-white text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">เรทใหม่ (บาท/M)</label>
+                            <input type="number" id="newRateInput" value="20" min="0.1" step="any"
+                                class="w-full bg-slate-900 border border-slate-700 rounded-lg py-2 px-3 text-white text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comparison Cards -->
+                <div class="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- Old Price Box -->
+                    <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
+                        <div class="text-xs text-slate-400 font-medium">ราคาเดิมในเกม (เรท <span id="dispOldRateText">25</span> บาท)</div>
+                        <div class="text-xl font-bold text-slate-200" id="oldPriceUnits">400,000 สลึง</div>
+                        <div class="text-sm font-semibold text-amber-400" id="oldPriceM">0.40 M</div>
+                    </div>
+
+                    <!-- New Price Box -->
+                    <div class="p-4 rounded-xl bg-amber-950/30 border border-amber-500/40 space-y-2 relative overflow-hidden">
+                        <div class="text-xs text-amber-300 font-medium">ราคาใหม่ที่ต้องปรับขึ้น (เรท <span id="dispNewRateText">20</span> บาท)</div>
+                        <div class="text-xl font-bold text-emerald-400" id="newPriceUnits">500,000 สลึง</div>
+                        <div class="text-sm font-semibold text-emerald-300" id="newPriceM">0.50 M</div>
+                        
+                        <div class="mt-2 pt-2 border-t border-amber-500/30 flex items-center justify-between text-xs">
+                            <span class="text-slate-400">ต้องบวกเพิ่ม:</span>
+                            <span class="font-bold text-amber-400" id="priceDiffDiff">+100,000 สลึง (+25.00%)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: DYNAMIC PRICE REFERENCE TABLE -->
+        <section class="glass-card rounded-2xl p-6 shadow-xl">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                <div>
+                    <h2 class="text-lg font-semibold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-table-list text-emerald-400"></i>
+                        ตารางอ้างอิงการตั้งราคาขายในโยกัง (เทียบราคาเงินจริง)
+                    </h2>
+                    <p class="text-sm text-slate-400">คำนวณอัตโนมัติตามเรทปัจจุบัน: <span class="text-amber-400 font-semibold" id="tableRateNotice">1M = 25 บาท</span></p>
+                </div>
+                <div class="text-xs bg-slate-900 px-3 py-2 rounded-lg border border-slate-800 text-slate-400">
+                    <i class="fa-solid fa-lightbulb text-amber-400 mr-1"></i> ใช้ดูเรทราคากลางสำหรับตั้งร้านในเกมได้ทันที
+                </div>
+            </div>
+
+            <div class="overflow-x-auto rounded-xl border border-slate-800">
+                <table class="w-full text-left text-sm text-slate-300">
+                    <thead class="bg-slate-900/90 text-xs uppercase text-slate-400 border-b border-slate-800">
+                        <tr>
+                            <th scope="col" class="py-3.5 px-6 font-semibold">ราคาเงินจริง (บาท)</th>
+                            <th scope="col" class="py-3.5 px-6 font-semibold">ราคาในเกม (สลึง)</th>
+                            <th scope="col" class="py-3.5 px-6 font-semibold">ราคาในเกม (หน่วย M)</th>
+                            <th scope="col" class="py-3.5 px-6 font-semibold text-right">ตัวอย่างไอเทมโยกังใกล้เคียง</th>
+                        </tr>
+                    </thead>
+                    <tbody id="quickTableBody" class="divide-y divide-slate-800/60 bg-slate-900/40">
+                        <!-- Rows dynamically populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 text-center text-xs text-slate-500 space-y-1">
+        <p>ระบบคำนวณและเทียบราคาเงิน M เกมโยกัง (Yulgang Online Currency & Inflation Converter)</p>
+        <p>พัฒนาขึ้นเพื่อความสะดวกของพ่อค้าและผู้เล่นโยกังในการตั้งราคาขายไอเทม</p>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Global variables
+        let currentRate = 25; // Default THB per 1M
+
+        // Preset THB values for reference table with Yulgang item examples
+        const referenceData = [
+            { thb: 1, example: 'ลูกกวาด 1 เม็ด (เรท 1 บาท)' },
+            { thb: 2, example: 'ลูกกวาดเหลือง 1 เม็ด' },
+            { thb: 3, example: 'ลูกกวาดฟ้า 1 เม็ด' },
+            { thb: 5, example: 'หินวิญญาณ / ยาบัฟเล็ก' },
+            { thb: 10, example: 'ยาเม็ดวิเศษ 1 เม็ด' },
+            { thb: 15, example: 'ยาครอบเซียน 1 วัน' },
+            { thb: 20, example: 'กล่องบัฟมอลล์ / ยาเซียน' },
+            { thb: 50, example: 'ยาทิพย์พฤกษา / บัฟโยกัง' },
+            { thb: 100, example: 'ชุดคลุมมอลล์ / ยาบัฟใหญ่' },
+            { thb: 200, example: 'ยันต์ข้ามหอ / คลุมมอลล์นิยม' },
+            { thb: 500, example: 'แพ็กเกจมอลล์ / อาวุธท็อป' },
+            { thb: 1000, example: 'คลุมมอลล์หายาก / อุปกรณ์เซ็ตใหญ่' }
+        ];
+
+        // Format number with commas
+        function formatNumber(num, decimals = 0) {
+            if (isNaN(num)) return '0';
+            return num.toLocaleString('en-US', {
+                minimumFractionDigits: decimals,
+                maximumFractionDigits: decimals
+            });
+        }
+
+        // Format M representation
+        function formatM(units) {
+            const mVal = units / 1000000;
+            if (mVal >= 1) {
+                return formatNumber(mVal, 2) + ' M';
+            } else if (mVal >= 0.01) {
+                return formatNumber(mVal, 2) + ' M';
+            } else {
+                return formatNumber(mVal, 4) + ' M';
+            }
+        }
+
+        // Set Rate function attached to window
+        window.setRate = function(rate) {
+            currentRate = parseFloat(rate) || 25;
+            document.getElementById('customRate').value = currentRate;
+            
+            // Update UI Active Preset Style
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                const btnText = btn.querySelector('.font-bold').innerText;
+                if (parseFloat(btnText) === currentRate) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            updateAllCalculations();
+        };
+
+        // Helper to quick-set Yulgang Item Presets
+        window.setYulgangItem = function(name, cost) {
+            document.getElementById('itemNameInput').value = name;
+            document.getElementById('itemCostInput').value = cost;
+            document.getElementById('itemQtyInput').value = 1;
+            updateCalc2();
+        };
+
+        // Set THB Input helper attached to window
+        window.setThbInput = function(val) {
+            document.getElementById('thbInput').value = val;
+            updateCalc1();
+        };
+
+        // Update Calculator 1 (THB -> Game Currency)
+        function updateCalc1() {
+            const thb = parseFloat(document.getElementById('thbInput').value) || 0;
+            const unitsPerThb = 1000000 / currentRate;
+            const totalUnits = thb * unitsPerThb;
+
+            document.getElementById('calc1ResultUnits').innerText = formatNumber(totalUnits, 0) + ' สลึง';
+            document.getElementById('calc1ResultM').innerText = formatM(totalUnits);
+        }
+
+        // Update Calculator 2 (Yulgang Item Pricing)
+        function updateCalc2() {
+            const name = document.getElementById('itemNameInput').value || 'ไอเทม';
+            const costPerUnit = parseFloat(document.getElementById('itemCostInput').value) || 0;
+            const qty = parseFloat(document.getElementById('itemQtyInput').value) || 1;
+
+            const unitsPerThb = 1000000 / currentRate;
+            const unitPriceUnits = costPerUnit * unitsPerThb;
+            const totalPriceUnits = unitPriceUnits * qty;
+
+            document.getElementById('itemNameDisplay').innerText = `${name} (${formatNumber(qty)} ชิ้น)`;
+            document.getElementById('itemUnitPriceDisplay').innerText = `${formatNumber(unitPriceUnits, 0)} สลึง (${formatM(unitPriceUnits)})`;
+            document.getElementById('itemTotalPriceDisplay').innerText = `${formatNumber(totalPriceUnits, 0)} สลึง (${formatM(totalPriceUnits)})`;
+        }
+
+        // Update Calculator 3 (Inflation Comparison)
+        function updateCompare() {
+            const thb = parseFloat(document.getElementById('compareThbInput').value) || 0;
+            const oldRate = parseFloat(document.getElementById('oldRateInput').value) || 25;
+            const newRate = parseFloat(document.getElementById('newRateInput').value) || 20;
+
+            document.getElementById('dispOldRateText').innerText = oldRate;
+            document.getElementById('dispNewRateText').innerText = newRate;
+
+            const oldUnits = thb * (1000000 / oldRate);
+            const newUnits = thb * (1000000 / newRate);
+
+            document.getElementById('oldPriceUnits').innerText = formatNumber(oldUnits, 0) + ' สลึง';
+            document.getElementById('oldPriceM').innerText = formatM(oldUnits);
+
+            document.getElementById('newPriceUnits').innerText = formatNumber(newUnits, 0) + ' สลึง';
+            document.getElementById('newPriceM').innerText = formatM(newUnits);
+
+            const diffUnits = newUnits - oldUnits;
+            const percentChange = oldUnits > 0 ? ((newUnits - oldUnits) / oldUnits) * 100 : 0;
+
+            const sign = diffUnits >= 0 ? '+' : '';
+            document.getElementById('priceDiffDiff').innerText = `${sign}${formatNumber(diffUnits, 0)} สลึง (${sign}${percentChange.toFixed(2)}%)`;
+        }
+
+        // Populate Reference Table
+        function updateTable() {
+            document.getElementById('tableRateNotice').innerText = `1M = ${currentRate} บาท`;
+            const tbody = document.getElementById('quickTableBody');
+            tbody.innerHTML = '';
+
+            const unitsPerThb = 1000000 / currentRate;
+
+            referenceData.forEach(item => {
+                const totalUnits = item.thb * unitsPerThb;
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-800/60 transition';
+                tr.innerHTML = `
+                    <td class="py-3 px-6 font-bold text-white">${formatNumber(item.thb)} บาท</td>
+                    <td class="py-3 px-6 text-emerald-400 font-semibold">${formatNumber(totalUnits, 0)} สลึง</td>
+                    <td class="py-3 px-6 text-amber-400 font-semibold">${formatM(totalUnits)}</td>
+                    <td class="py-3 px-6 text-right text-slate-400 text-xs">${item.example}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Update all components
+        function updateAllCalculations() {
+            document.getElementById('currentRateDisplay').innerText = currentRate;
+            document.getElementById('oneMToThbDisplay').innerText = currentRate;
+            
+            const unitsPerThb = 1000000 / currentRate;
+            document.getElementById('thbToOneUnitDisplay').innerText = formatNumber(unitsPerThb, 0);
+
+            updateCalc1();
+            updateCalc2();
+            updateCompare();
+            updateTable();
+        }
+
+        // Initialize App on DOM Load
+        window.addEventListener('DOMContentLoaded', function() {
+            // Event listener for custom rate input
+            document.getElementById('customRate').addEventListener('input', function(e) {
+                const val = parseFloat(e.target.value);
+                if (val > 0) {
+                    currentRate = val;
+                    document.querySelectorAll('.preset-btn').forEach(btn => {
+                        const btnText = btn.querySelector('.font-bold').innerText;
+                        if (parseFloat(btnText) === currentRate) {
+                            btn.classList.add('active');
+                        } else {
+                            btn.classList.remove('active');
+                        }
+                    });
+                    updateAllCalculations();
+                }
+            });
+
+            // Event listeners for inputs
+            document.getElementById('thbInput').addEventListener('input', updateCalc1);
+            document.getElementById('itemNameInput').addEventListener('input', updateCalc2);
+            document.getElementById('itemCostInput').addEventListener('input', updateCalc2);
+            document.getElementById('itemQtyInput').addEventListener('input', updateCalc2);
+            document.getElementById('compareThbInput').addEventListener('input', updateCompare);
+            document.getElementById('oldRateInput').addEventListener('input', updateCompare);
+            document.getElementById('newRateInput').addEventListener('input', updateCompare);
+
+            // Initial calculation run
+            updateAllCalculations();
+        });
+    </script>
+</body>
+</html>
