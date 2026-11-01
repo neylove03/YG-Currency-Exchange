@@ -173,7 +173,7 @@
         </section>
 
         <!-- SECTION 2: CALCULATORS GRID -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
             <!-- CALCULATOR 1: THB -> In-Game Currency -->
             <div class="glass-card rounded-2xl p-6 shadow-xl flex flex-col justify-between">
@@ -183,8 +183,8 @@
                             <i class="fa-solid fa-calculator text-lg"></i>
                         </div>
                         <div>
-                            <h3 class="font-bold text-lg text-white">1. แปลงเงินจริง (บาท) ➔ ราคาขายในโยกัง</h3>
-                            <p class="text-xs text-slate-400">ใส่จำนวนเงินบาทเพื่อดูว่าต้องตั้งขายกี่ M / กี่สลึง</p>
+                            <h3 class="font-bold text-lg text-white">1. เงินจริง ➔ เงินในเกม</h3>
+                            <p class="text-xs text-slate-400">แปลงเงินบาทเป็นสลึง/M</p>
                         </div>
                     </div>
 
@@ -199,13 +199,13 @@
                         </div>
 
                         <!-- Quick THB buttons -->
-                        <div class="flex flex-wrap gap-2 pt-1">
-                            <button onclick="window.setThbInput(1)" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700">1 บาท</button>
-                            <button onclick="window.setThbInput(2)" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700">2 บาท</button>
-                            <button onclick="window.setThbInput(5)" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700">5 บาท</button>
-                            <button onclick="window.setThbInput(10)" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700">10 บาท</button>
-                            <button onclick="window.setThbInput(50)" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700">50 บาท</button>
-                            <button onclick="window.setThbInput(100)" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700">100 บาท</button>
+                        <div class="flex flex-wrap gap-1.5 pt-1">
+                            <button onclick="window.setThbInput(1)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700">1 บาท</button>
+                            <button onclick="window.setThbInput(2)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700">2 บาท</button>
+                            <button onclick="window.setThbInput(5)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700">5 บาท</button>
+                            <button onclick="window.setThbInput(10)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700">10 บาท</button>
+                            <button onclick="window.setThbInput(50)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700">50 บาท</button>
+                            <button onclick="window.setThbInput(100)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700">100 บาท</button>
                         </div>
                     </div>
                 </div>
@@ -215,16 +215,74 @@
                     <div class="text-xs text-slate-400 uppercase tracking-wider font-semibold">ราคาที่ต้องตั้งในเกมโยกัง</div>
                     <div class="flex items-baseline justify-between">
                         <span class="text-slate-400 text-sm">จำนวนสลึงเต็ม:</span>
-                        <span class="text-2xl font-extrabold text-emerald-400" id="calc1ResultUnits">80,000</span>
+                        <span class="text-xl font-extrabold text-emerald-400" id="calc1ResultUnits">80,000</span>
                     </div>
                     <div class="flex items-baseline justify-between border-t border-slate-800 pt-2">
                         <span class="text-slate-400 text-sm">หน่วย M (ล้าน):</span>
-                        <span class="text-xl font-bold text-amber-400" id="calc1ResultM">0.08 M</span>
+                        <span class="text-lg font-bold text-amber-400" id="calc1ResultM">0.08 M</span>
                     </div>
                 </div>
             </div>
 
-            <!-- CALCULATOR 2: Yulgang Item Pricing Helper -->
+            <!-- CALCULATOR NEW: Game Currency -> THB -->
+            <div class="glass-card rounded-2xl p-6 shadow-xl flex flex-col justify-between border-t-2 border-t-emerald-500">
+                <div>
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="p-2.5 rounded-xl bg-emerald-500/20 text-emerald-400">
+                            <i class="fa-solid fa-hand-holding-dollar text-lg"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg text-white">2. เงินในเกม ➔ เงินจริง</h3>
+                            <p class="text-xs text-slate-400">แปลงสลึง/M เป็นเงินบาท</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">จำนวนหน่วย M (ล้าน)</label>
+                            <div class="relative">
+                                <input type="number" id="gameMInput" value="1" min="0" step="any"
+                                    class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-white text-base font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500 pr-10">
+                                <span class="absolute right-3 top-2.5 text-xs text-slate-400 font-bold">M</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">หรือ จำนวนสลึงเต็ม</label>
+                            <div class="relative">
+                                <input type="number" id="gameUnitsInput" value="1000000" min="0" step="1"
+                                    class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-white text-base font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500 pr-12">
+                                <span class="absolute right-3 top-2.5 text-xs text-slate-400">สลึง</span>
+                            </div>
+                        </div>
+
+                        <!-- Quick M buttons -->
+                        <div class="flex flex-wrap gap-1.5 pt-1">
+                            <button onclick="window.setGameMInput(0.08)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700">0.08M</button>
+                            <button onclick="window.setGameMInput(1)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700">1M</button>
+                            <button onclick="window.setGameMInput(5)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700">5M</button>
+                            <button onclick="window.setGameMInput(10)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700">10M</button>
+                            <button onclick="window.setGameMInput(50)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700">50M</button>
+                            <button onclick="window.setGameMInput(100)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700">100M</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Result Box -->
+                <div class="mt-6 p-4 rounded-xl bg-slate-900/90 border border-emerald-500/40 space-y-3">
+                    <div class="text-xs text-emerald-400 uppercase tracking-wider font-semibold">คิดเป็นมูลค่าเงินจริง</div>
+                    <div class="flex items-baseline justify-between">
+                        <span class="text-slate-400 text-sm">รวมเป็นเงินบาท:</span>
+                        <span class="text-2xl font-extrabold text-emerald-400" id="gameToThbResult">25.00 บาท</span>
+                    </div>
+                    <div class="flex items-baseline justify-between border-t border-slate-800 pt-2">
+                        <span class="text-slate-400 text-sm">ตามเรทปัจจุบัน:</span>
+                        <span class="text-sm font-semibold text-amber-400" id="gameToThbRateDisplay">1M = 25 บาท</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CALCULATOR 3: Yulgang Item Pricing Helper -->
             <div class="glass-card rounded-2xl p-6 shadow-xl flex flex-col justify-between">
                 <div>
                     <div class="flex items-center space-x-3 mb-3">
@@ -232,8 +290,8 @@
                             <i class="fa-solid fa-store text-lg"></i>
                         </div>
                         <div>
-                            <h3 class="font-bold text-lg text-white">2. คำนวณราคาตั้งขายไอเทมโยกัง</h3>
-                            <p class="text-xs text-slate-400">คลิกเลือกไอเทมตัวอย่าง หรือกำหนดราคา/จำนวนเอง</p>
+                            <h3 class="font-bold text-lg text-white">3. ตั้งราคาขายไอเทมโยกัง</h3>
+                            <p class="text-xs text-slate-400">เลือกไอเทมหรือกำหนดเอง</p>
                         </div>
                     </div>
 
@@ -241,19 +299,19 @@
                     <div class="mb-4">
                         <label class="block text-xs text-slate-400 mb-1.5">ไอเทมยอดนิยมในโยกัง:</label>
                         <div class="flex flex-wrap gap-1.5">
-                            <button onclick="window.setYulgangItem('ลูกกวาดเหลือง', 2)" class="item-chip px-2.5 py-1 bg-slate-800 rounded-lg text-xs border border-amber-500/30 text-amber-300">
+                            <button onclick="window.setYulgangItem('ลูกกวาดเหลือง', 2)" class="item-chip px-2 py-1 bg-slate-800 rounded-lg text-xs border border-amber-500/30 text-amber-300">
                                 🍬 ลูกกวาดเหลือง (2฿)
                             </button>
-                            <button onclick="window.setYulgangItem('ลูกกวาดฟ้า', 3)" class="item-chip px-2.5 py-1 bg-slate-800 rounded-lg text-xs border border-amber-500/30 text-sky-300">
+                            <button onclick="window.setYulgangItem('ลูกกวาดฟ้า', 3)" class="item-chip px-2 py-1 bg-slate-800 rounded-lg text-xs border border-amber-500/30 text-sky-300">
                                 🍬 ลูกกวาดฟ้า (3฿)
                             </button>
-                            <button onclick="window.setYulgangItem('ยาครอบเซียน 1 วัน', 15)" class="item-chip px-2.5 py-1 bg-slate-800 rounded-lg text-xs border border-amber-500/30 text-emerald-300">
+                            <button onclick="window.setYulgangItem('ยาครอบเซียน 1 วัน', 15)" class="item-chip px-2 py-1 bg-slate-800 rounded-lg text-xs border border-amber-500/30 text-emerald-300">
                                 💊 ยาครอบเซียน (15฿)
                             </button>
-                            <button onclick="window.setYulgangItem('ยาเม็ดวิเศษ', 10)" class="item-chip px-2.5 py-1 bg-slate-800 rounded-lg text-xs border border-amber-500/30 text-purple-300">
+                            <button onclick="window.setYulgangItem('ยาเม็ดวิเศษ', 10)" class="item-chip px-2 py-1 bg-slate-800 rounded-lg text-xs border border-amber-500/30 text-purple-300">
                                 💊 ยาเม็ดวิเศษ (10฿)
                             </button>
-                            <button onclick="window.setYulgangItem('หินวิญญาณ', 5)" class="item-chip px-2.5 py-1 bg-slate-800 rounded-lg text-xs border border-amber-500/30 text-rose-300">
+                            <button onclick="window.setYulgangItem('หินวิญญาณ', 5)" class="item-chip px-2 py-1 bg-slate-800 rounded-lg text-xs border border-amber-500/30 text-rose-300">
                                 💎 หินวิญญาณ (5฿)
                             </button>
                         </div>
@@ -272,7 +330,7 @@
                                     class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-white text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500">
                             </div>
                             <div>
-                                <label class="block text-xs text-slate-400 mb-1">จำนวนที่ขาย (เม็ด/ชิ้น)</label>
+                                <label class="block text-xs text-slate-400 mb-1">จำนวนที่ขาย (ชิ้น)</label>
                                 <input type="number" id="itemQtyInput" value="1" min="1" step="1"
                                     class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-white text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500">
                             </div>
@@ -284,15 +342,15 @@
                 <div class="mt-6 p-4 rounded-xl bg-slate-900/90 border border-amber-500/40 space-y-3">
                     <div class="flex justify-between items-center">
                         <span class="text-xs text-amber-400 font-semibold uppercase tracking-wider">ราคาตั้งขายในเกมโยกัง</span>
-                        <span class="text-xs text-slate-400" id="itemNameDisplay">ลูกกวาดเหลือง (1 ชิ้น)</span>
+                        <span class="text-xs text-slate-400 truncate max-w-[120px]" id="itemNameDisplay">ลูกกวาดเหลือง (1 ชิ้น)</span>
                     </div>
                     <div class="flex items-baseline justify-between">
                         <span class="text-slate-400 text-sm">ต่อ 1 ชิ้น:</span>
-                        <span class="text-xl font-bold text-amber-400" id="itemUnitPriceDisplay">80,000 (0.08 M)</span>
+                        <span class="text-lg font-bold text-amber-400" id="itemUnitPriceDisplay">80,000 (0.08 M)</span>
                     </div>
                     <div class="flex items-baseline justify-between border-t border-slate-800 pt-2">
-                        <span class="text-slate-400 text-sm">ราคารวมตั้งขายร้าน:</span>
-                        <span class="text-2xl font-extrabold text-emerald-400" id="itemTotalPriceDisplay">80,000 (0.08 M)</span>
+                        <span class="text-slate-400 text-sm">ราคารวมตั้งขาย:</span>
+                        <span class="text-xl font-extrabold text-emerald-400" id="itemTotalPriceDisplay">80,000 (0.08 M)</span>
                     </div>
                 </div>
             </div>
@@ -471,6 +529,13 @@
             updateCalc1();
         };
 
+        // Set Game M Input helper attached to window
+        window.setGameMInput = function(mVal) {
+            document.getElementById('gameMInput').value = mVal;
+            document.getElementById('gameUnitsInput').value = mVal * 1000000;
+            updateGameToThb();
+        };
+
         // Update Calculator 1 (THB -> Game Currency)
         function updateCalc1() {
             const thb = parseFloat(document.getElementById('thbInput').value) || 0;
@@ -481,7 +546,27 @@
             document.getElementById('calc1ResultM').innerText = formatM(totalUnits);
         }
 
-        // Update Calculator 2 (Yulgang Item Pricing)
+        // Update New Calculator (Game Currency -> THB)
+        function updateGameToThb(sourceInput) {
+            const mInput = document.getElementById('gameMInput');
+            const unitsInput = document.getElementById('gameUnitsInput');
+
+            let totalM = 0;
+            if (sourceInput === 'units') {
+                const units = parseFloat(unitsInput.value) || 0;
+                totalM = units / 1000000;
+                mInput.value = totalM;
+            } else {
+                totalM = parseFloat(mInput.value) || 0;
+                unitsInput.value = totalM * 1000000;
+            }
+
+            const totalThb = totalM * currentRate;
+            document.getElementById('gameToThbResult').innerText = formatNumber(totalThb, 2) + ' บาท';
+            document.getElementById('gameToThbRateDisplay').innerText = `1M = ${currentRate} บาท`;
+        }
+
+        // Update Calculator 3 (Yulgang Item Pricing)
         function updateCalc2() {
             const name = document.getElementById('itemNameInput').value || 'ไอเทม';
             const costPerUnit = parseFloat(document.getElementById('itemCostInput').value) || 0;
@@ -493,10 +578,10 @@
 
             document.getElementById('itemNameDisplay').innerText = `${name} (${formatNumber(qty)} ชิ้น)`;
             document.getElementById('itemUnitPriceDisplay').innerText = `${formatNumber(unitPriceUnits, 0)} สลึง (${formatM(unitPriceUnits)})`;
-            document.getElementById('itemTotalPriceDisplay').innerText = `${formatNumber(totalPriceUnits, 0)} สลึง (${formatM(totalPriceUnits)})`;
+            document.getElementById('itemTotalPriceDisplay').innerText = `${formatNumber(totalTotalPriceUnits = totalPriceUnits, 0)} สลึง (${formatM(totalPriceUnits)})`;
         }
 
-        // Update Calculator 3 (Inflation Comparison)
+        // Update Calculator 4 (Inflation Comparison)
         function updateCompare() {
             const thb = parseFloat(document.getElementById('compareThbInput').value) || 0;
             const oldRate = parseFloat(document.getElementById('oldRateInput').value) || 25;
@@ -552,6 +637,7 @@
             document.getElementById('thbToOneUnitDisplay').innerText = formatNumber(unitsPerThb, 0);
 
             updateCalc1();
+            updateGameToThb();
             updateCalc2();
             updateCompare();
             updateTable();
@@ -578,6 +664,8 @@
 
             // Event listeners for inputs
             document.getElementById('thbInput').addEventListener('input', updateCalc1);
+            document.getElementById('gameMInput').addEventListener('input', function() { updateGameToThb('m'); });
+            document.getElementById('gameUnitsInput').addEventListener('input', function() { updateGameToThb('units'); });
             document.getElementById('itemNameInput').addEventListener('input', updateCalc2);
             document.getElementById('itemCostInput').addEventListener('input', updateCalc2);
             document.getElementById('itemQtyInput').addEventListener('input', updateCalc2);
