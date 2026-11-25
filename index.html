@@ -2,7 +2,10 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <meta name="theme-color" content="#0b0f19">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>ระบบคำนวณราคาเงิน M และไอเทมเกมโยกัง (Yulgang Online Calculator)</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -41,10 +44,12 @@
             font-family: 'Kanit', sans-serif;
             background-color: #0b0f19;
             color: #f8fafc;
+            -webkit-tap-highlight-color: transparent;
         }
         .glass-card {
             background: rgba(30, 41, 59, 0.75);
             backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 215, 0, 0.12);
         }
         .preset-btn.active {
@@ -60,10 +65,23 @@
             border-color: #fbbf24;
             transform: translateY(-1px);
         }
+        /* Mobile touch improvements & prevent iOS zoom */
+        @media (max-width: 640px) {
+            input[type="number"], input[type="text"], select {
+                font-size: 16px !important; /* Prevents auto-zoom on iOS */
+            }
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
         /* Custom scrollbar */
         ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
         }
         ::-webkit-scrollbar-track {
             background: #0b0f19;
@@ -80,40 +98,42 @@
 <body class="min-h-screen pb-12">
 
     <!-- Top Navigation Header -->
-    <header class="border-b border-amber-500/20 bg-slate-900/90 sticky top-0 z-50 backdrop-blur-md">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col lg:flex-row items-center justify-between gap-4">
-            <div class="flex items-center space-x-3">
-                <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-amber-500 via-orange-500 to-yellow-400 flex items-center justify-center shadow-lg shadow-amber-500/20 ring-2 ring-amber-400/30">
-                    <i class="fa-solid font-bold fa-dragon text-slate-950 text-2xl"></i>
-                </div>
-                <div>
-                    <h1 class="text-xl font-bold bg-gradient-to-r from-amber-300 via-yellow-200 to-white bg-clip-text text-transparent flex items-center gap-2">
-                        Yulgang Currency Calculator
-                        <span class="text-xs px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 font-normal">โยกัง ออนไลน์</span>
-                    </h1>
-                    <p class="text-xs text-slate-400">คำนวณราคาเงิน M, ค่าความดี, ตั้งราคาขายไอเทมโยกัง</p>
+    <header class="border-b border-amber-500/20 bg-slate-900/95 sticky top-0 z-50 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3.5 flex flex-col lg:flex-row items-center justify-between gap-3 sm:gap-4">
+            <div class="flex items-center space-x-2.5 sm:space-x-3 w-full lg:w-auto justify-between lg:justify-start">
+                <div class="flex items-center space-x-2.5 sm:space-x-3">
+                    <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-tr from-amber-500 via-orange-500 to-yellow-400 flex items-center justify-center shadow-lg shadow-amber-500/20 ring-2 ring-amber-400/30 shrink-0">
+                        <i class="fa-solid font-bold fa-dragon text-slate-950 text-xl sm:text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-base sm:text-xl font-bold bg-gradient-to-r from-amber-300 via-yellow-200 to-white bg-clip-text text-transparent flex items-center gap-1.5 sm:gap-2 leading-tight">
+                            Yulgang Calculator
+                            <span class="text-[10px] sm:text-xs px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 font-normal">โยกัง</span>
+                        </h1>
+                        <p class="text-[11px] sm:text-xs text-slate-400 leading-tight">คำนวณเงิน M, ค่าความดี, ตั้งราคาขายไอเทม</p>
+                    </div>
                 </div>
             </div>
-            <!-- Quick Navigation Menu -->
-            <nav class="flex flex-wrap items-center justify-center gap-2 text-xs">
-                <a href="#m-rate-section" class="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition flex items-center gap-1.5">
+            <!-- Quick Navigation Menu with smooth horizontal swipe on mobile -->
+            <nav class="flex items-center gap-1.5 sm:gap-2 text-xs overflow-x-auto no-scrollbar w-full lg:w-auto py-1 px-0.5 -mx-0.5 scroll-smooth">
+                <a href="#m-rate-section" class="px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition flex items-center gap-1.5 shrink-0 whitespace-nowrap active:scale-95 touch-manipulation">
                     <i class="fa-solid fa-coins text-amber-400"></i>
                     <span>เรทเงิน M</span>
                 </a>
-                <a href="#item-calc-section" class="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition flex items-center gap-1.5">
+                <a href="#item-calc-section" class="px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition flex items-center gap-1.5 shrink-0 whitespace-nowrap active:scale-95 touch-manipulation">
                     <i class="fa-solid fa-calculator text-blue-400"></i>
                     <span>แปลงเงิน & ไอเทม</span>
                 </a>
-                <a href="#honor-section" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500/20 via-orange-500/20 to-yellow-500/20 hover:from-amber-500/30 hover:to-orange-500/30 text-amber-300 border border-amber-400/50 shadow-lg shadow-amber-500/10 transition flex items-center gap-1.5 font-semibold">
+                <a href="#honor-section" class="px-3 sm:px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500/25 via-orange-500/25 to-yellow-500/25 hover:from-amber-500/35 hover:to-orange-500/35 text-amber-300 border border-amber-400/50 shadow-md shadow-amber-500/10 transition flex items-center gap-1.5 shrink-0 whitespace-nowrap font-semibold active:scale-95 touch-manipulation">
                     <i class="fa-solid fa-award text-amber-400"></i>
                     <span>เมนูค่าความดี</span>
-                    <span class="text-[10px] bg-amber-500 text-slate-950 font-black px-1.5 py-0.2 rounded-full">NEW</span>
+                    <span class="text-[9px] sm:text-[10px] bg-amber-500 text-slate-950 font-black px-1.5 py-0.2 rounded-full">NEW</span>
                 </a>
-                <a href="#inflation-section" class="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition flex items-center gap-1.5">
+                <a href="#inflation-section" class="px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition flex items-center gap-1.5 shrink-0 whitespace-nowrap active:scale-95 touch-manipulation">
                     <i class="fa-solid fa-chart-line text-emerald-400"></i>
                     <span>เทียบเงินเฟ้อ</span>
                 </a>
-                <a href="#reference-table-section" class="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition flex items-center gap-1.5">
+                <a href="#reference-table-section" class="px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition flex items-center gap-1.5 shrink-0 whitespace-nowrap active:scale-95 touch-manipulation">
                     <i class="fa-solid fa-table-list text-purple-400"></i>
                     <span>ตารางราคา</span>
                 </a>
@@ -121,141 +141,141 @@
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 space-y-8">
+    <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 mt-4 sm:mt-8 space-y-4 sm:space-y-8">
 
         <!-- SECTION 1: SETTINGS PANEL -->
-        <section id="m-rate-section" class="glass-card rounded-2xl p-6 shadow-xl relative overflow-hidden">
+        <section id="m-rate-section" class="glass-card rounded-2xl p-4 sm:p-6 shadow-xl relative overflow-hidden">
             <div class="absolute -top-24 -right-24 w-60 h-60 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
             
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
                 <div>
-                    <h2 class="text-lg font-semibold text-white flex items-center gap-2">
+                    <h2 class="text-base sm:text-lg font-semibold text-white flex items-center gap-2">
                         <i class="fa-solid fa-coins text-amber-400"></i>
                         ตั้งค่าอัตราแลกเปลี่ยนเงิน M โยกัง (1M = กี่บาท?)
                     </h2>
-                    <p class="text-sm text-slate-400">เลือกราคาเรทเงิน M ปัจจุบันของคุณ เพื่ออัปเดตราคาตั้งขายไอเทมทั้งระบบ</p>
+                    <p class="text-xs sm:text-sm text-slate-400">เลือกราคาเรทเงิน M ปัจจุบันของคุณ เพื่ออัปเดตราคาตั้งขายไอเทมทั้งระบบ</p>
                 </div>
                 
                 <!-- Custom Input -->
-                <div class="flex items-center space-x-2 bg-slate-900/90 p-1.5 rounded-xl border border-slate-700 focus-within:border-amber-500 transition-colors">
+                <div class="flex items-center justify-between sm:justify-start space-x-2 bg-slate-900/90 p-1.5 rounded-xl border border-slate-700 focus-within:border-amber-500 transition-colors w-full sm:w-auto">
                     <label for="customRate" class="text-xs text-slate-400 pl-2">เรทเงิน M:</label>
                     <input type="number" id="customRate" value="25" min="0.1" step="0.5" 
-                        class="w-24 bg-slate-800 text-amber-400 font-bold text-center py-1.5 px-2 rounded-lg border border-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm">
+                        class="w-20 sm:w-24 bg-slate-800 text-amber-400 font-bold text-center py-1.5 px-2 rounded-lg border border-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm">
                     <span class="text-xs font-semibold text-slate-300 pr-2">บาท / 1M</span>
                 </div>
             </div>
 
-            <!-- Preset Buttons Grid -->
-            <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-2.5">
-                <button onclick="window.setRate(25)" class="preset-btn active py-2.5 px-3 rounded-xl border border-slate-700 bg-slate-800/80 hover:bg-slate-700 transition font-medium text-sm flex flex-col items-center justify-center">
-                    <span class="text-xs text-slate-400">เรทปกติ</span>
+            <!-- Preset Buttons Grid: 4 cols on mobile, 8 on md -->
+            <div class="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-8 gap-1.5 sm:gap-2.5">
+                <button onclick="window.setRate(25)" class="preset-btn active py-2 sm:py-2.5 px-1 sm:px-3 rounded-xl border border-slate-700 bg-slate-800/80 hover:bg-slate-700 transition font-medium text-xs sm:text-sm flex flex-col items-center justify-center touch-manipulation active:scale-95">
+                    <span class="text-[10px] sm:text-xs text-slate-400">เรทปกติ</span>
                     <span class="font-bold">25 บาท</span>
                 </button>
-                <button onclick="window.setRate(24)" class="preset-btn py-2.5 px-3 rounded-xl border border-slate-700 bg-slate-800/80 hover:bg-slate-700 transition font-medium text-sm flex flex-col items-center justify-center">
-                    <span class="text-xs text-slate-400">เฟ้อเล็กน้อย</span>
+                <button onclick="window.setRate(24)" class="preset-btn py-2 sm:py-2.5 px-1 sm:px-3 rounded-xl border border-slate-700 bg-slate-800/80 hover:bg-slate-700 transition font-medium text-xs sm:text-sm flex flex-col items-center justify-center touch-manipulation active:scale-95">
+                    <span class="text-[10px] sm:text-xs text-slate-400">เฟ้อเล็กน้อย</span>
                     <span class="font-bold">24 บาท</span>
                 </button>
-                <button onclick="window.setRate(23)" class="preset-btn py-2.5 px-3 rounded-xl border border-slate-700 bg-slate-800/80 hover:bg-slate-700 transition font-medium text-sm flex flex-col items-center justify-center">
-                    <span class="text-xs text-slate-400">เฟ้อเล็กน้อย</span>
+                <button onclick="window.setRate(23)" class="preset-btn py-2 sm:py-2.5 px-1 sm:px-3 rounded-xl border border-slate-700 bg-slate-800/80 hover:bg-slate-700 transition font-medium text-xs sm:text-sm flex flex-col items-center justify-center touch-manipulation active:scale-95">
+                    <span class="text-[10px] sm:text-xs text-slate-400">เฟ้อเล็กน้อย</span>
                     <span class="font-bold">23 บาท</span>
                 </button>
-                <button onclick="window.setRate(22)" class="preset-btn py-2.5 px-3 rounded-xl border border-slate-700 bg-slate-800/80 hover:bg-slate-700 transition font-medium text-sm flex flex-col items-center justify-center">
-                    <span class="text-xs text-slate-400">เฟ้อปานกลาง</span>
+                <button onclick="window.setRate(22)" class="preset-btn py-2 sm:py-2.5 px-1 sm:px-3 rounded-xl border border-slate-700 bg-slate-800/80 hover:bg-slate-700 transition font-medium text-xs sm:text-sm flex flex-col items-center justify-center touch-manipulation active:scale-95">
+                    <span class="text-[10px] sm:text-xs text-slate-400">เฟ้อปานกลาง</span>
                     <span class="font-bold">22 บาท</span>
                 </button>
-                <button onclick="window.setRate(21)" class="preset-btn py-2.5 px-3 rounded-xl border border-slate-700 bg-slate-800/80 hover:bg-slate-700 transition font-medium text-sm flex flex-col items-center justify-center">
-                    <span class="text-xs text-slate-400">เฟ้อปานกลาง</span>
+                <button onclick="window.setRate(21)" class="preset-btn py-2 sm:py-2.5 px-1 sm:px-3 rounded-xl border border-slate-700 bg-slate-800/80 hover:bg-slate-700 transition font-medium text-xs sm:text-sm flex flex-col items-center justify-center touch-manipulation active:scale-95">
+                    <span class="text-[10px] sm:text-xs text-slate-400">เฟ้อปานกลาง</span>
                     <span class="font-bold">21 บาท</span>
                 </button>
-                <button onclick="window.setRate(20)" class="preset-btn py-2.5 px-3 rounded-xl border border-slate-700 bg-slate-800/80 hover:bg-slate-700 transition font-medium text-sm flex flex-col items-center justify-center">
-                    <span class="text-xs text-slate-400">เงินเฟ้อหนัก</span>
+                <button onclick="window.setRate(20)" class="preset-btn py-2 sm:py-2.5 px-1 sm:px-3 rounded-xl border border-slate-700 bg-slate-800/80 hover:bg-slate-700 transition font-medium text-xs sm:text-sm flex flex-col items-center justify-center touch-manipulation active:scale-95">
+                    <span class="text-[10px] sm:text-xs text-slate-400">เฟ้อหนัก</span>
                     <span class="font-bold">20 บาท</span>
                 </button>
-                <button onclick="window.setRate(15)" class="preset-btn py-2.5 px-3 rounded-xl border border-slate-700 bg-slate-800/80 hover:bg-slate-700 transition font-medium text-sm flex flex-col items-center justify-center">
-                    <span class="text-xs text-slate-400">เฟ้อรุนแรง</span>
+                <button onclick="window.setRate(15)" class="preset-btn py-2 sm:py-2.5 px-1 sm:px-3 rounded-xl border border-slate-700 bg-slate-800/80 hover:bg-slate-700 transition font-medium text-xs sm:text-sm flex flex-col items-center justify-center touch-manipulation active:scale-95">
+                    <span class="text-[10px] sm:text-xs text-slate-400">เฟ้อรุนแรง</span>
                     <span class="font-bold">15 บาท</span>
                 </button>
-                <button onclick="window.setRate(10)" class="preset-btn py-2.5 px-3 rounded-xl border border-slate-700 bg-slate-800/80 hover:bg-slate-700 transition font-medium text-sm flex flex-col items-center justify-center">
-                    <span class="text-xs text-slate-400">เฟ้อวิกฤต</span>
+                <button onclick="window.setRate(10)" class="preset-btn py-2 sm:py-2.5 px-1 sm:px-3 rounded-xl border border-slate-700 bg-slate-800/80 hover:bg-slate-700 transition font-medium text-xs sm:text-sm flex flex-col items-center justify-center touch-manipulation active:scale-95">
+                    <span class="text-[10px] sm:text-xs text-slate-400">เฟ้อวิกฤต</span>
                     <span class="font-bold">10 บาท</span>
                 </button>
             </div>
 
             <!-- Current Rate Summary Banner -->
-            <div class="mt-5 p-4 rounded-xl bg-slate-900/80 border border-slate-800 flex flex-wrap items-center justify-between gap-4 text-sm">
+            <div class="mt-4 sm:mt-5 p-3 sm:p-4 rounded-xl bg-slate-900/80 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4 text-xs sm:text-sm">
                 <div class="flex items-center space-x-2">
                     <i class="fa-solid fa-circle-info text-amber-400"></i>
-                    <span>สถานะเรทปัจจุบัน: <span class="font-bold text-white">1M (สลึง) = <span id="currentRateDisplay" class="text-amber-400">25</span> บาท</span></span>
+                    <span>เรทปัจจุบัน: <span class="font-bold text-white">1M = <span id="currentRateDisplay" class="text-amber-400">25</span> บาท</span></span>
                 </div>
-                <div class="flex flex-wrap items-center gap-4 text-xs sm:text-sm">
+                <div class="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm">
                     <span>เงินจริง 1 บาท = <strong class="text-emerald-400" id="thbToOneUnitDisplay">40,000</strong> สลึง</span>
-                    <span class="text-slate-600">|</span>
+                    <span class="text-slate-600 hidden sm:inline">|</span>
                     <span>1,000,000 สลึง = <strong class="text-amber-400" id="oneMToThbDisplay">25</strong> บาท</span>
                 </div>
             </div>
         </section>
 
         <!-- SECTION 2: CALCULATORS GRID -->
-        <div id="item-calc-section" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div id="item-calc-section" class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
             
             <!-- CALCULATOR 1: THB -> In-Game Currency -->
-            <div class="glass-card rounded-2xl p-6 shadow-xl flex flex-col justify-between">
+            <div class="glass-card rounded-2xl p-4 sm:p-6 shadow-xl flex flex-col justify-between">
                 <div>
-                    <div class="flex items-center space-x-3 mb-4">
-                        <div class="p-2.5 rounded-xl bg-amber-500/20 text-amber-400">
-                            <i class="fa-solid fa-calculator text-lg"></i>
+                    <div class="flex items-center space-x-3 mb-3 sm:mb-4">
+                        <div class="p-2 sm:p-2.5 rounded-xl bg-amber-500/20 text-amber-400">
+                            <i class="fa-solid fa-calculator text-base sm:text-lg"></i>
                         </div>
                         <div>
-                            <h3 class="font-bold text-lg text-white">1. เงินจริง ➔ เงินในเกม</h3>
+                            <h3 class="font-bold text-base sm:text-lg text-white">1. เงินจริง ➔ เงินในเกม</h3>
                             <p class="text-xs text-slate-400">แปลงเงินบาทเป็นสลึง/M</p>
                         </div>
                     </div>
 
-                    <div class="space-y-4">
+                    <div class="space-y-3 sm:space-y-4">
                         <div>
-                            <label class="block text-sm font-medium text-slate-300 mb-1">จำนวนเงินจริง (บาท)</label>
+                            <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-1">จำนวนเงินจริง (บาท)</label>
                             <div class="relative">
                                 <input type="number" id="thbInput" value="1" min="0" step="any"
-                                    class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2.5 px-4 text-white text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500 pr-12">
-                                <span class="absolute right-4 top-3 text-sm text-slate-400">บาท</span>
+                                    class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 sm:py-2.5 sm:px-4 text-white text-base sm:text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500 pr-12">
+                                <span class="absolute right-3.5 top-2.5 sm:top-3 text-xs sm:text-sm text-slate-400">บาท</span>
                             </div>
                         </div>
 
                         <!-- Quick THB buttons -->
                         <div class="flex flex-wrap gap-1.5 pt-1">
-                            <button onclick="window.setThbInput(1)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700">1 บาท</button>
-                            <button onclick="window.setThbInput(2)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700">2 บาท</button>
-                            <button onclick="window.setThbInput(5)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700">5 บาท</button>
-                            <button onclick="window.setThbInput(10)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700">10 บาท</button>
-                            <button onclick="window.setThbInput(50)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700">50 บาท</button>
-                            <button onclick="window.setThbInput(100)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700">100 บาท</button>
+                            <button onclick="window.setThbInput(1)" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700 active:scale-95 touch-manipulation transition">1 บาท</button>
+                            <button onclick="window.setThbInput(2)" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700 active:scale-95 touch-manipulation transition">2 บาท</button>
+                            <button onclick="window.setThbInput(5)" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700 active:scale-95 touch-manipulation transition">5 บาท</button>
+                            <button onclick="window.setThbInput(10)" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700 active:scale-95 touch-manipulation transition">10 บาท</button>
+                            <button onclick="window.setThbInput(50)" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700 active:scale-95 touch-manipulation transition">50 บาท</button>
+                            <button onclick="window.setThbInput(100)" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700 active:scale-95 touch-manipulation transition">100 บาท</button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Result Box -->
-                <div class="mt-6 p-4 rounded-xl bg-slate-900/90 border border-slate-800 space-y-3">
-                    <div class="text-xs text-slate-400 uppercase tracking-wider font-semibold">ราคาที่ต้องตั้งในเกมโยกัง</div>
+                <div class="mt-4 sm:mt-6 p-3.5 sm:p-4 rounded-xl bg-slate-900/90 border border-slate-800 space-y-2.5 sm:space-y-3">
+                    <div class="text-[11px] sm:text-xs text-slate-400 uppercase tracking-wider font-semibold">ราคาที่ต้องตั้งในเกมโยกัง</div>
                     <div class="flex items-baseline justify-between">
-                        <span class="text-slate-400 text-sm">จำนวนสลึงเต็ม:</span>
-                        <span class="text-xl font-extrabold text-emerald-400" id="calc1ResultUnits">80,000</span>
+                        <span class="text-slate-400 text-xs sm:text-sm">จำนวนสลึงเต็ม:</span>
+                        <span class="text-lg sm:text-xl font-extrabold text-emerald-400" id="calc1ResultUnits">80,000</span>
                     </div>
                     <div class="flex items-baseline justify-between border-t border-slate-800 pt-2">
-                        <span class="text-slate-400 text-sm">หน่วย M (ล้าน):</span>
-                        <span class="text-lg font-bold text-amber-400" id="calc1ResultM">0.08 M</span>
+                        <span class="text-slate-400 text-xs sm:text-sm">หน่วย M (ล้าน):</span>
+                        <span class="text-base sm:text-lg font-bold text-amber-400" id="calc1ResultM">0.08 M</span>
                     </div>
                 </div>
             </div>
 
             <!-- CALCULATOR NEW: Game Currency -> THB -->
-            <div class="glass-card rounded-2xl p-6 shadow-xl flex flex-col justify-between border-t-2 border-t-emerald-500">
+            <div class="glass-card rounded-2xl p-4 sm:p-6 shadow-xl flex flex-col justify-between border-t-2 border-t-emerald-500">
                 <div>
-                    <div class="flex items-center space-x-3 mb-4">
-                        <div class="p-2.5 rounded-xl bg-emerald-500/20 text-emerald-400">
-                            <i class="fa-solid fa-hand-holding-dollar text-lg"></i>
+                    <div class="flex items-center space-x-3 mb-3 sm:mb-4">
+                        <div class="p-2 sm:p-2.5 rounded-xl bg-emerald-500/20 text-emerald-400">
+                            <i class="fa-solid fa-hand-holding-dollar text-base sm:text-lg"></i>
                         </div>
                         <div>
-                            <h3 class="font-bold text-lg text-white">2. เงินในเกม ➔ เงินจริง</h3>
+                            <h3 class="font-bold text-base sm:text-lg text-white">2. เงินในเกม ➔ เงินจริง</h3>
                             <p class="text-xs text-slate-400">แปลงสลึง/M เป็นเงินบาท</p>
                         </div>
                     </div>
@@ -266,7 +286,7 @@
                             <div class="relative">
                                 <input type="number" id="gameMInput" value="1" min="0" step="any"
                                     class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-white text-base font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500 pr-10">
-                                <span class="absolute right-3 top-2.5 text-xs text-slate-400 font-bold">M</span>
+                                <span class="absolute right-3 top-2 text-xs text-slate-400 font-bold">M</span>
                             </div>
                         </div>
 
@@ -275,66 +295,66 @@
                             <div class="relative">
                                 <input type="number" id="gameUnitsInput" value="1000000" min="0" step="1"
                                     class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-white text-base font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500 pr-12">
-                                <span class="absolute right-3 top-2.5 text-xs text-slate-400">สลึง</span>
+                                <span class="absolute right-3 top-2 text-xs text-slate-400">สลึง</span>
                             </div>
                         </div>
 
                         <!-- Quick M buttons -->
                         <div class="flex flex-wrap gap-1.5 pt-1">
-                            <button onclick="window.setGameMInput(0.08)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700">0.08M</button>
-                            <button onclick="window.setGameMInput(1)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700">1M</button>
-                            <button onclick="window.setGameMInput(5)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700">5M</button>
-                            <button onclick="window.setGameMInput(10)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700">10M</button>
-                            <button onclick="window.setGameMInput(50)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700">50M</button>
-                            <button onclick="window.setGameMInput(100)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700">100M</button>
+                            <button onclick="window.setGameMInput(0.08)" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700 active:scale-95 touch-manipulation transition">0.08M</button>
+                            <button onclick="window.setGameMInput(1)" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700 active:scale-95 touch-manipulation transition">1M</button>
+                            <button onclick="window.setGameMInput(5)" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700 active:scale-95 touch-manipulation transition">5M</button>
+                            <button onclick="window.setGameMInput(10)" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700 active:scale-95 touch-manipulation transition">10M</button>
+                            <button onclick="window.setGameMInput(50)" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700 active:scale-95 touch-manipulation transition">50M</button>
+                            <button onclick="window.setGameMInput(100)" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700 active:scale-95 touch-manipulation transition">100M</button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Result Box -->
-                <div class="mt-6 p-4 rounded-xl bg-slate-900/90 border border-emerald-500/40 space-y-3">
-                    <div class="text-xs text-emerald-400 uppercase tracking-wider font-semibold">คิดเป็นมูลค่าเงินจริง</div>
+                <div class="mt-4 sm:mt-6 p-3.5 sm:p-4 rounded-xl bg-slate-900/90 border border-emerald-500/40 space-y-2.5 sm:space-y-3">
+                    <div class="text-[11px] sm:text-xs text-emerald-400 uppercase tracking-wider font-semibold">คิดเป็นมูลค่าเงินจริง</div>
                     <div class="flex items-baseline justify-between">
-                        <span class="text-slate-400 text-sm">รวมเป็นเงินบาท:</span>
-                        <span class="text-2xl font-extrabold text-emerald-400" id="gameToThbResult">25.00 บาท</span>
+                        <span class="text-slate-400 text-xs sm:text-sm">รวมเป็นเงินบาท:</span>
+                        <span class="text-xl sm:text-2xl font-extrabold text-emerald-400" id="gameToThbResult">25.00 บาท</span>
                     </div>
                     <div class="flex items-baseline justify-between border-t border-slate-800 pt-2">
-                        <span class="text-slate-400 text-sm">ตามเรทปัจจุบัน:</span>
-                        <span class="text-sm font-semibold text-amber-400" id="gameToThbRateDisplay">1M = 25 บาท</span>
+                        <span class="text-slate-400 text-xs sm:text-sm">ตามเรทปัจจุบัน:</span>
+                        <span class="text-xs sm:text-sm font-semibold text-amber-400" id="gameToThbRateDisplay">1M = 25 บาท</span>
                     </div>
                 </div>
             </div>
 
             <!-- CALCULATOR 3: Yulgang Item Pricing Helper -->
-            <div class="glass-card rounded-2xl p-6 shadow-xl flex flex-col justify-between">
+            <div class="glass-card rounded-2xl p-4 sm:p-6 shadow-xl flex flex-col justify-between">
                 <div>
                     <div class="flex items-center space-x-3 mb-3">
-                        <div class="p-2.5 rounded-xl bg-amber-500/20 text-amber-400">
-                            <i class="fa-solid fa-store text-lg"></i>
+                        <div class="p-2 sm:p-2.5 rounded-xl bg-amber-500/20 text-amber-400">
+                            <i class="fa-solid fa-store text-base sm:text-lg"></i>
                         </div>
                         <div>
-                            <h3 class="font-bold text-lg text-white">3. ตั้งราคาขายไอเทมโยกัง</h3>
+                            <h3 class="font-bold text-base sm:text-lg text-white">3. ตั้งราคาขายไอเทมโยกัง</h3>
                             <p class="text-xs text-slate-400">เลือกไอเทมหรือกำหนดเอง</p>
                         </div>
                     </div>
 
                     <!-- Yulgang Preset Items Buttons -->
-                    <div class="mb-4">
+                    <div class="mb-3 sm:mb-4">
                         <label class="block text-xs text-slate-400 mb-1.5">ไอเทมยอดนิยมในโยกัง:</label>
                         <div class="flex flex-wrap gap-1.5">
-                            <button onclick="window.setYulgangItem('ลูกกวาดเหลือง', 2)" class="item-chip px-2 py-1 bg-slate-800 rounded-lg text-xs border border-amber-500/30 text-amber-300">
+                            <button onclick="window.setYulgangItem('ลูกกวาดเหลือง', 2)" class="item-chip px-2.5 py-1 bg-slate-800 rounded-lg text-xs border border-amber-500/30 text-amber-300 active:scale-95 touch-manipulation">
                                 🍬 ลูกกวาดเหลือง (2฿)
                             </button>
-                            <button onclick="window.setYulgangItem('ลูกกวาดฟ้า', 3)" class="item-chip px-2 py-1 bg-slate-800 rounded-lg text-xs border border-amber-500/30 text-sky-300">
+                            <button onclick="window.setYulgangItem('ลูกกวาดฟ้า', 3)" class="item-chip px-2.5 py-1 bg-slate-800 rounded-lg text-xs border border-amber-500/30 text-sky-300 active:scale-95 touch-manipulation">
                                 🍬 ลูกกวาดฟ้า (3฿)
                             </button>
-                            <button onclick="window.setYulgangItem('ยาครอบเซียน 1 วัน', 15)" class="item-chip px-2 py-1 bg-slate-800 rounded-lg text-xs border border-amber-500/30 text-emerald-300">
+                            <button onclick="window.setYulgangItem('ยาครอบเซียน 1 วัน', 15)" class="item-chip px-2.5 py-1 bg-slate-800 rounded-lg text-xs border border-amber-500/30 text-emerald-300 active:scale-95 touch-manipulation">
                                 💊 ยาครอบเซียน (15฿)
                             </button>
-                            <button onclick="window.setYulgangItem('ยาเม็ดวิเศษ', 10)" class="item-chip px-2 py-1 bg-slate-800 rounded-lg text-xs border border-amber-500/30 text-purple-300">
+                            <button onclick="window.setYulgangItem('ยาเม็ดวิเศษ', 10)" class="item-chip px-2.5 py-1 bg-slate-800 rounded-lg text-xs border border-amber-500/30 text-purple-300 active:scale-95 touch-manipulation">
                                 💊 ยาเม็ดวิเศษ (10฿)
                             </button>
-                            <button onclick="window.setYulgangItem('หินวิญญาณ', 5)" class="item-chip px-2 py-1 bg-slate-800 rounded-lg text-xs border border-amber-500/30 text-rose-300">
+                            <button onclick="window.setYulgangItem('หินวิญญาณ', 5)" class="item-chip px-2.5 py-1 bg-slate-800 rounded-lg text-xs border border-amber-500/30 text-rose-300 active:scale-95 touch-manipulation">
                                 💎 หินวิญญาณ (5฿)
                             </button>
                         </div>
@@ -344,36 +364,36 @@
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">ชื่อไอเทม</label>
                             <input type="text" id="itemNameInput" value="ลูกกวาดเหลือง" placeholder="เช่น ลูกกวาดเหลือง, ยาครอบเซียน"
-                                class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-white text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+                                class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-white text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
                         </div>
-                        <div class="grid grid-cols-2 gap-3">
+                        <div class="grid grid-cols-2 gap-2.5 sm:gap-3">
                             <div>
-                                <label class="block text-xs text-slate-400 mb-1">มูลค่าเงินจริง/ชิ้น (บาท)</label>
+                                <label class="block text-xs text-slate-400 mb-1">มูลค่าจริง/ชิ้น (บาท)</label>
                                 <input type="number" id="itemCostInput" value="1" min="0" step="any"
-                                    class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-white text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500">
+                                    class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-white text-base sm:text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500">
                             </div>
                             <div>
                                 <label class="block text-xs text-slate-400 mb-1">จำนวนที่ขาย (ชิ้น)</label>
                                 <input type="number" id="itemQtyInput" value="1" min="1" step="1"
-                                    class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-white text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500">
+                                    class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-white text-base sm:text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500">
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Result Box -->
-                <div class="mt-6 p-4 rounded-xl bg-slate-900/90 border border-amber-500/40 space-y-3">
+                <div class="mt-4 sm:mt-6 p-3.5 sm:p-4 rounded-xl bg-slate-900/90 border border-amber-500/40 space-y-2.5 sm:space-y-3">
                     <div class="flex justify-between items-center">
-                        <span class="text-xs text-amber-400 font-semibold uppercase tracking-wider">ราคาตั้งขายในเกมโยกัง</span>
+                        <span class="text-[11px] sm:text-xs text-amber-400 font-semibold uppercase tracking-wider">ราคาตั้งขายในเกม</span>
                         <span class="text-xs text-slate-400 truncate max-w-[120px]" id="itemNameDisplay">ลูกกวาดเหลือง (1 ชิ้น)</span>
                     </div>
                     <div class="flex items-baseline justify-between">
-                        <span class="text-slate-400 text-sm">ต่อ 1 ชิ้น:</span>
-                        <span class="text-lg font-bold text-amber-400" id="itemUnitPriceDisplay">80,000 (0.08 M)</span>
+                        <span class="text-slate-400 text-xs sm:text-sm">ต่อ 1 ชิ้น:</span>
+                        <span class="text-base sm:text-lg font-bold text-amber-400" id="itemUnitPriceDisplay">80,000 (0.08 M)</span>
                     </div>
                     <div class="flex items-baseline justify-between border-t border-slate-800 pt-2">
-                        <span class="text-slate-400 text-sm">ราคารวมตั้งขาย:</span>
-                        <span class="text-xl font-extrabold text-emerald-400" id="itemTotalPriceDisplay">80,000 (0.08 M)</span>
+                        <span class="text-slate-400 text-xs sm:text-sm">ราคารวมตั้งขาย:</span>
+                        <span class="text-lg sm:text-xl font-extrabold text-emerald-400" id="itemTotalPriceDisplay">80,000 (0.08 M)</span>
                     </div>
                 </div>
             </div>
@@ -381,13 +401,13 @@
         </div>
 
         <!-- SECTION: HONOR POINTS CALCULATOR (ระบบคำนวณค่าความดี) -->
-        <section id="honor-section" class="glass-card rounded-2xl p-6 shadow-2xl border-2 border-amber-500/40 relative overflow-hidden">
+        <section id="honor-section" class="glass-card rounded-2xl p-4 sm:p-6 shadow-2xl border-2 border-amber-500/40 relative overflow-hidden">
             <!-- Glow background decor -->
             <div class="absolute -top-32 -right-32 w-80 h-80 bg-amber-500/15 rounded-full blur-3xl pointer-events-none"></div>
             <div class="absolute -bottom-32 -left-32 w-80 h-80 bg-yellow-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
             <!-- Header -->
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 relative z-10">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-5 sm:mb-6 relative z-10">
                 <div>
                     <div class="flex items-center gap-2 mb-1">
                         <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-1.5">
@@ -395,17 +415,17 @@
                         </span>
                         <span class="text-xs text-slate-400">ระบบคำนวณโยกัง</span>
                     </div>
-                    <h2 class="text-xl sm:text-2xl font-bold bg-gradient-to-r from-amber-300 via-yellow-200 to-white bg-clip-text text-transparent flex items-center gap-2.5">
-                        <i class="fa-solid fa-award text-amber-400"></i>
-                        ระบบคำนวณอัตราแลกเปลี่ยน "ค่าความดี" (Honor Points)
+                    <h2 class="text-lg sm:text-2xl font-bold bg-gradient-to-r from-amber-300 via-yellow-200 to-white bg-clip-text text-transparent flex items-center gap-2">
+                        <i class="fa-solid fa-award text-amber-400 shrink-0"></i>
+                        <span>ระบบคำนวณอัตราแลกเปลี่ยน "ค่าความดี" (Honor Points)</span>
                     </h2>
-                    <p class="text-sm text-slate-300 mt-1">
+                    <p class="text-xs sm:text-sm text-slate-300 mt-1">
                         คำนวณราคาซื้อ-ขายค่าความดีโยกัง ปรับแต่งเรทราคา (บาท) และจำนวนหน่วยอ้างอิงได้อย่างอิสระ
                     </p>
                 </div>
 
                 <!-- Honor Rate Config Badge/Box -->
-                <div class="bg-slate-900/90 border border-amber-500/40 rounded-xl p-3 shadow-lg">
+                <div class="bg-slate-900/90 border border-amber-500/40 rounded-xl p-3 shadow-lg shrink-0">
                     <div class="text-[11px] text-slate-400 mb-1 flex items-center justify-between gap-2">
                         <span>เรทปัจจุบันที่ใช้คำนวณ:</span>
                         <span class="text-emerald-400 font-semibold" id="honorSummaryRate">1,000 แต้ม = 60.00 บาท</span>
@@ -417,48 +437,50 @@
             </div>
 
             <!-- Rate Setting Controller -->
-            <div class="bg-slate-900/80 rounded-xl p-4 border border-slate-800 mb-6 relative z-10">
-                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                    <div class="flex flex-wrap items-center gap-3">
-                        <span class="text-sm font-semibold text-slate-200 flex items-center gap-2">
+            <div class="bg-slate-900/80 rounded-xl p-3.5 sm:p-4 border border-slate-800 mb-5 sm:mb-6 relative z-10">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                        <span class="text-xs sm:text-sm font-semibold text-slate-200 flex items-center gap-2">
                             <i class="fa-solid fa-sliders text-amber-400"></i> กำหนดเรทอัตราแลกเปลี่ยน:
                         </span>
                         
-                        <!-- Rate Base Points Input -->
-                        <div class="flex items-center space-x-1.5 bg-slate-950 px-2.5 py-1.5 rounded-lg border border-slate-700 focus-within:border-amber-500 transition">
-                            <span class="text-xs text-slate-400">จำนวน:</span>
-                            <input type="number" id="honorRateBase" value="1000" min="1" step="100"
-                                class="w-20 bg-transparent text-amber-300 font-bold text-center text-sm focus:outline-none">
-                            <span class="text-xs text-slate-400">แต้มความดี</span>
-                        </div>
+                        <div class="flex items-center gap-2 w-full sm:w-auto">
+                            <!-- Rate Base Points Input -->
+                            <div class="flex items-center space-x-1.5 bg-slate-950 px-2.5 py-1.5 rounded-lg border border-slate-700 focus-within:border-amber-500 transition flex-1 sm:flex-initial">
+                                <span class="text-xs text-slate-400">จำนวน:</span>
+                                <input type="number" id="honorRateBase" value="1000" min="1" step="100"
+                                    class="w-full sm:w-20 bg-transparent text-amber-300 font-bold text-center text-sm focus:outline-none">
+                                <span class="text-xs text-slate-400">แต้ม</span>
+                            </div>
 
-                        <span class="text-slate-500 font-bold">=</span>
+                            <span class="text-slate-500 font-bold text-sm sm:text-base">=</span>
 
-                        <!-- Rate Price THB Input -->
-                        <div class="flex items-center space-x-1.5 bg-slate-950 px-2.5 py-1.5 rounded-lg border border-slate-700 focus-within:border-amber-500 transition">
-                            <span class="text-xs text-slate-400">ราคา:</span>
-                            <input type="number" id="honorRatePrice" value="60" min="0.1" step="any"
-                                class="w-20 bg-transparent text-emerald-400 font-bold text-center text-sm focus:outline-none">
-                            <span class="text-xs text-slate-400">บาท</span>
+                            <!-- Rate Price THB Input -->
+                            <div class="flex items-center space-x-1.5 bg-slate-950 px-2.5 py-1.5 rounded-lg border border-slate-700 focus-within:border-amber-500 transition flex-1 sm:flex-initial">
+                                <span class="text-xs text-slate-400">ราคา:</span>
+                                <input type="number" id="honorRatePrice" value="60" min="0.1" step="any"
+                                    class="w-full sm:w-20 bg-transparent text-emerald-400 font-bold text-center text-sm focus:outline-none">
+                                <span class="text-xs text-slate-400">บาท</span>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Preset Rate Buttons -->
-                    <div class="flex flex-wrap items-center gap-1.5">
-                        <span class="text-xs text-slate-400 mr-1">เรทยอดนิยม:</span>
-                        <button onclick="window.setHonorPreset(50, 1000)" data-price="50" class="honor-preset-btn px-2.5 py-1 rounded-lg text-xs font-medium border border-slate-700 bg-slate-800 hover:bg-slate-700 transition">
+                    <div class="flex items-center gap-1 sm:gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+                        <span class="text-xs text-slate-400 shrink-0 mr-1">เรทยอดนิยม:</span>
+                        <button onclick="window.setHonorPreset(50, 1000)" data-price="50" class="honor-preset-btn px-2.5 py-1 rounded-lg text-xs font-medium border border-slate-700 bg-slate-800 hover:bg-slate-700 active:scale-95 touch-manipulation transition shrink-0">
                             50฿ / 1k
                         </button>
-                        <button onclick="window.setHonorPreset(55, 1000)" data-price="55" class="honor-preset-btn px-2.5 py-1 rounded-lg text-xs font-medium border border-slate-700 bg-slate-800 hover:bg-slate-700 transition">
+                        <button onclick="window.setHonorPreset(55, 1000)" data-price="55" class="honor-preset-btn px-2.5 py-1 rounded-lg text-xs font-medium border border-slate-700 bg-slate-800 hover:bg-slate-700 active:scale-95 touch-manipulation transition shrink-0">
                             55฿ / 1k
                         </button>
-                        <button onclick="window.setHonorPreset(60, 1000)" data-price="60" class="honor-preset-btn px-2.5 py-1 rounded-lg text-xs font-bold border border-amber-400 bg-amber-500/20 text-amber-300 shadow-sm transition">
+                        <button onclick="window.setHonorPreset(60, 1000)" data-price="60" class="honor-preset-btn px-2.5 py-1 rounded-lg text-xs font-bold border border-amber-400 bg-amber-500/20 text-amber-300 shadow-sm active:scale-95 touch-manipulation transition shrink-0">
                             60฿ / 1k (แนะนำ)
                         </button>
-                        <button onclick="window.setHonorPreset(65, 1000)" data-price="65" class="honor-preset-btn px-2.5 py-1 rounded-lg text-xs font-medium border border-slate-700 bg-slate-800 hover:bg-slate-700 transition">
+                        <button onclick="window.setHonorPreset(65, 1000)" data-price="65" class="honor-preset-btn px-2.5 py-1 rounded-lg text-xs font-medium border border-slate-700 bg-slate-800 hover:bg-slate-700 active:scale-95 touch-manipulation transition shrink-0">
                             65฿ / 1k
                         </button>
-                        <button onclick="window.setHonorPreset(70, 1000)" data-price="70" class="honor-preset-btn px-2.5 py-1 rounded-lg text-xs font-medium border border-slate-700 bg-slate-800 hover:bg-slate-700 transition">
+                        <button onclick="window.setHonorPreset(70, 1000)" data-price="70" class="honor-preset-btn px-2.5 py-1 rounded-lg text-xs font-medium border border-slate-700 bg-slate-800 hover:bg-slate-700 active:scale-95 touch-manipulation transition shrink-0">
                             70฿ / 1k
                         </button>
                     </div>
@@ -466,14 +488,14 @@
             </div>
 
             <!-- 2 Main Interactive Calculators Grid -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 relative z-10">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 relative z-10">
 
                 <!-- CALCULATOR A: SELL HONOR POINTS (แปลงค่าความดี ➔ เงินบาท) -->
-                <div class="bg-slate-900/90 rounded-2xl p-5 border border-amber-500/30 flex flex-col justify-between shadow-xl">
+                <div class="bg-slate-900/90 rounded-2xl p-4 sm:p-5 border border-amber-500/30 flex flex-col justify-between shadow-xl">
                     <div>
                         <div class="flex items-center justify-between mb-4">
                             <div class="flex items-center space-x-3">
-                                <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-lg border border-amber-500/30">
+                                <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-lg border border-amber-500/30 shrink-0">
                                     <i class="fa-solid fa-coins"></i>
                                 </div>
                                 <div>
@@ -483,7 +505,7 @@
                                     <p class="text-xs text-slate-400">คำนวณจำนวนเงินจริงที่ได้รับเมื่อขายแต้มความดี</p>
                                 </div>
                             </div>
-                            <span class="text-xs font-semibold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">ขายแต้ม</span>
+                            <span class="text-xs font-semibold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shrink-0">ขายแต้ม</span>
                         </div>
 
                         <!-- Input for Sell Amount -->
@@ -500,38 +522,38 @@
                             </div>
 
                             <!-- Quick preset buttons for sell -->
-                            <div class="flex flex-wrap gap-1.5 pt-1">
-                                <button onclick="window.setHonorSellAmount(1000)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700 transition">1,000</button>
-                                <button onclick="window.setHonorSellAmount(3000)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700 transition">3,000</button>
-                                <button onclick="window.setHonorSellAmount(5000)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700 transition">5,000</button>
-                                <button onclick="window.setHonorSellAmount(10000)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700 transition">10,000</button>
-                                <button onclick="window.setHonorSellAmount(50000)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700 transition">50,000</button>
-                                <button onclick="window.setHonorSellAmount(100000)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700 transition">100,000</button>
+                            <div class="grid grid-cols-3 sm:flex sm:flex-wrap gap-1.5 pt-1">
+                                <button onclick="window.setHonorSellAmount(1000)" class="px-2 py-1.5 sm:py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700 active:scale-95 touch-manipulation text-center transition">1,000</button>
+                                <button onclick="window.setHonorSellAmount(3000)" class="px-2 py-1.5 sm:py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700 active:scale-95 touch-manipulation text-center transition">3,000</button>
+                                <button onclick="window.setHonorSellAmount(5000)" class="px-2 py-1.5 sm:py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700 active:scale-95 touch-manipulation text-center transition">5,000</button>
+                                <button onclick="window.setHonorSellAmount(10000)" class="px-2 py-1.5 sm:py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700 active:scale-95 touch-manipulation text-center transition">10,000</button>
+                                <button onclick="window.setHonorSellAmount(50000)" class="px-2 py-1.5 sm:py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700 active:scale-95 touch-manipulation text-center transition">50,000</button>
+                                <button onclick="window.setHonorSellAmount(100000)" class="px-2 py-1.5 sm:py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700 active:scale-95 touch-manipulation text-center transition">100,000</button>
                             </div>
                         </div>
                     </div>
 
                     <!-- Result Box Sell -->
-                    <div class="mt-5 p-4 rounded-xl bg-slate-950/80 border border-amber-500/40 space-y-3">
+                    <div class="mt-4 sm:mt-5 p-3.5 sm:p-4 rounded-xl bg-slate-950/80 border border-amber-500/40 space-y-3">
                         <div class="flex items-center justify-between text-xs text-slate-400">
-                            <span class="uppercase tracking-wider font-semibold text-amber-400">จำนวนเงินจริงที่ได้รับ</span>
-                            <span class="text-[11px] text-slate-500">คำนวณตามเรทที่ตั้งไว้</span>
+                            <span class="uppercase tracking-wider font-semibold text-amber-400 text-[11px] sm:text-xs">จำนวนเงินจริงที่ได้รับ</span>
+                            <span class="text-[10px] sm:text-[11px] text-slate-500">คำนวณตามเรทที่ตั้งไว้</span>
                         </div>
 
                         <div class="flex items-baseline justify-between">
-                            <span class="text-slate-400 text-sm">รวมเป็นเงิน:</span>
-                            <div>
-                                <span class="text-3xl sm:text-4xl font-black text-emerald-400" id="honorSellResultThb">60.00</span>
-                                <span class="text-lg font-bold text-emerald-300 ml-1">บาท</span>
+                            <span class="text-slate-400 text-xs sm:text-sm">รวมเป็นเงิน:</span>
+                            <div class="text-right">
+                                <span class="text-2xl sm:text-4xl font-black text-emerald-400" id="honorSellResultThb">60.00</span>
+                                <span class="text-base sm:text-lg font-bold text-emerald-300 ml-1">บาท</span>
                             </div>
                         </div>
 
                         <!-- Calculation breakdown formula -->
                         <div class="pt-2 border-t border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-400">
-                            <div>
+                            <div class="text-[11px] sm:text-xs">
                                 <span>สูตร: (<span id="calcFormulaPoints" class="text-white font-semibold">1,000</span> ÷ <span id="calcFormulaBase" class="text-white font-semibold">1,000</span>) × <span id="calcFormulaPrice" class="text-white font-semibold">60.00</span> ฿</span>
                             </div>
-                            <button id="copySellBtn" onclick="window.copyHonorSellText()" class="self-end sm:self-auto px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 transition flex items-center gap-1 text-xs">
+                            <button id="copySellBtn" onclick="window.copyHonorSellText()" class="w-full sm:w-auto px-3 py-1.5 sm:py-1 rounded-lg bg-slate-800 hover:bg-slate-700 active:scale-95 touch-manipulation text-amber-300 border border-amber-500/30 transition flex items-center justify-center gap-1.5 text-xs font-medium">
                                 <i class="fa-regular fa-copy"></i>
                                 <span>คัดลอกข้อความขาย</span>
                             </button>
@@ -540,11 +562,11 @@
                 </div>
 
                 <!-- CALCULATOR B: BUY HONOR POINTS (แปลงเงินบาท ➔ ได้กี่ความดี) -->
-                <div class="bg-slate-900/90 rounded-2xl p-5 border border-slate-800 flex flex-col justify-between shadow-xl">
+                <div class="bg-slate-900/90 rounded-2xl p-4 sm:p-5 border border-slate-800 flex flex-col justify-between shadow-xl">
                     <div>
                         <div class="flex items-center justify-between mb-4">
                             <div class="flex items-center space-x-3">
-                                <div class="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-lg border border-blue-500/30">
+                                <div class="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-lg border border-blue-500/30 shrink-0">
                                     <i class="fa-solid fa-wallet"></i>
                                 </div>
                                 <div>
@@ -554,7 +576,7 @@
                                     <p class="text-xs text-slate-400">คำนวณจำนวนแต้มที่จะได้รับตามงบประมาณเงินบาท</p>
                                 </div>
                             </div>
-                            <span class="text-xs font-semibold px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30">รับซื้อ</span>
+                            <span class="text-xs font-semibold px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30 shrink-0">รับซื้อ</span>
                         </div>
 
                         <!-- Input for Buy Amount -->
@@ -571,38 +593,38 @@
                             </div>
 
                             <!-- Quick preset buttons for buy -->
-                            <div class="flex flex-wrap gap-1.5 pt-1">
-                                <button onclick="window.setHonorBuyThb(60)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700 transition">60 ฿</button>
-                                <button onclick="window.setHonorBuyThb(100)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700 transition">100 ฿</button>
-                                <button onclick="window.setHonorBuyThb(180)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700 transition">180 ฿</button>
-                                <button onclick="window.setHonorBuyThb(300)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700 transition">300 ฿</button>
-                                <button onclick="window.setHonorBuyThb(500)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700 transition">500 ฿</button>
-                                <button onclick="window.setHonorBuyThb(1000)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700 transition">1,000 ฿</button>
+                            <div class="grid grid-cols-3 sm:flex sm:flex-wrap gap-1.5 pt-1">
+                                <button onclick="window.setHonorBuyThb(60)" class="px-2 py-1.5 sm:py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700 active:scale-95 touch-manipulation text-center transition">60 ฿</button>
+                                <button onclick="window.setHonorBuyThb(100)" class="px-2 py-1.5 sm:py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700 active:scale-95 touch-manipulation text-center transition">100 ฿</button>
+                                <button onclick="window.setHonorBuyThb(180)" class="px-2 py-1.5 sm:py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700 active:scale-95 touch-manipulation text-center transition">180 ฿</button>
+                                <button onclick="window.setHonorBuyThb(300)" class="px-2 py-1.5 sm:py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700 active:scale-95 touch-manipulation text-center transition">300 ฿</button>
+                                <button onclick="window.setHonorBuyThb(500)" class="px-2 py-1.5 sm:py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700 active:scale-95 touch-manipulation text-center transition">500 ฿</button>
+                                <button onclick="window.setHonorBuyThb(1000)" class="px-2 py-1.5 sm:py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300 border border-slate-700 active:scale-95 touch-manipulation text-center transition">1,000 ฿</button>
                             </div>
                         </div>
                     </div>
 
                     <!-- Result Box Buy -->
-                    <div class="mt-5 p-4 rounded-xl bg-slate-950/80 border border-blue-500/40 space-y-3">
+                    <div class="mt-4 sm:mt-5 p-3.5 sm:p-4 rounded-xl bg-slate-950/80 border border-blue-500/40 space-y-3">
                         <div class="flex items-center justify-between text-xs text-slate-400">
-                            <span class="uppercase tracking-wider font-semibold text-blue-400">จำนวนค่าความดีที่จะได้รับ</span>
-                            <span class="text-[11px] text-slate-500">คำนวณตามเรทที่ตั้งไว้</span>
+                            <span class="uppercase tracking-wider font-semibold text-blue-400 text-[11px] sm:text-xs">จำนวนค่าความดีที่จะได้รับ</span>
+                            <span class="text-[10px] sm:text-[11px] text-slate-500">คำนวณตามเรทที่ตั้งไว้</span>
                         </div>
 
                         <div class="flex items-baseline justify-between">
-                            <span class="text-slate-400 text-sm">จะได้รับความดี:</span>
-                            <div>
-                                <span class="text-3xl sm:text-4xl font-black text-amber-400" id="honorBuyResultPoints">1,000</span>
-                                <span class="text-lg font-bold text-amber-300 ml-1">แต้ม</span>
+                            <span class="text-slate-400 text-xs sm:text-sm">จะได้รับความดี:</span>
+                            <div class="text-right">
+                                <span class="text-2xl sm:text-4xl font-black text-amber-400" id="honorBuyResultPoints">1,000</span>
+                                <span class="text-base sm:text-lg font-bold text-amber-300 ml-1">แต้ม</span>
                             </div>
                         </div>
 
                         <!-- Calculation breakdown formula -->
                         <div class="pt-2 border-t border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-400">
-                            <div>
+                            <div class="text-[11px] sm:text-xs">
                                 <span>สูตร: (<span id="calcBuyFormulaThb" class="text-white font-semibold">60.00</span> ÷ <span id="calcBuyFormulaPrice" class="text-white font-semibold">60.00</span>) × <span id="calcBuyFormulaBase" class="text-white font-semibold">1,000</span></span>
                             </div>
-                            <button id="copyBuyBtn" onclick="window.copyHonorBuyText()" class="self-end sm:self-auto px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-blue-300 border border-blue-500/30 transition flex items-center gap-1 text-xs">
+                            <button id="copyBuyBtn" onclick="window.copyHonorBuyText()" class="w-full sm:w-auto px-3 py-1.5 sm:py-1 rounded-lg bg-slate-800 hover:bg-slate-700 active:scale-95 touch-manipulation text-blue-300 border border-blue-500/30 transition flex items-center justify-center gap-1.5 text-xs font-medium">
                                 <i class="fa-regular fa-copy"></i>
                                 <span>คัดลอกข้อความรับซื้อ</span>
                             </button>
@@ -613,21 +635,21 @@
             </div>
 
             <!-- Quick Honor Reference Table -->
-            <div class="mt-6 bg-slate-900/60 rounded-xl p-4 border border-slate-800 relative z-10">
-                <div class="flex items-center justify-between mb-3">
-                    <h4 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
+            <div class="mt-5 sm:mt-6 bg-slate-900/60 rounded-xl p-3.5 sm:p-4 border border-slate-800 relative z-10">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-4 mb-3">
+                    <h4 class="text-xs sm:text-sm font-semibold text-slate-200 flex items-center gap-2">
                         <i class="fa-solid fa-table-list text-amber-400"></i>
                         ตารางสรุปเรทค่าความดีด่วน (ตามเรทปัจจุบัน)
                     </h4>
-                    <span class="text-xs text-slate-400">คำนวณแบบ Real-time ตามเรทที่ระบุข้างต้น</span>
+                    <span class="text-[11px] sm:text-xs text-slate-400">คำนวณแบบ Real-time ตามเรทที่ระบุข้างต้น</span>
                 </div>
-                <div class="overflow-x-auto rounded-lg border border-slate-800">
-                    <table class="w-full text-left text-xs sm:text-sm text-slate-300">
+                <div class="overflow-x-auto rounded-lg border border-slate-800 -mx-1 sm:mx-0">
+                    <table class="w-full text-left text-xs sm:text-sm text-slate-300 min-w-[320px]">
                         <thead class="bg-slate-950/80 uppercase text-[11px] text-slate-400 border-b border-slate-800">
                             <tr>
-                                <th class="py-2.5 px-4 font-semibold">จำนวนแต้มความดี</th>
-                                <th class="py-2.5 px-4 font-semibold">มูลค่าเงินจริง (บาท)</th>
-                                <th class="py-2.5 px-4 font-semibold">เทียบสัดส่วน</th>
+                                <th class="py-2.5 px-3 sm:px-4 font-semibold whitespace-nowrap">จำนวนแต้มความดี</th>
+                                <th class="py-2.5 px-3 sm:px-4 font-semibold whitespace-nowrap">มูลค่าเงินจริง (บาท)</th>
+                                <th class="py-2.5 px-3 sm:px-4 font-semibold whitespace-nowrap">เทียบสัดส่วน</th>
                             </tr>
                         </thead>
                         <tbody id="honorTableBody" class="divide-y divide-slate-800/60 bg-slate-900/30">
@@ -639,20 +661,20 @@
         </section>
 
         <!-- SECTION 3: INFLATION COMPARISON FEATURE -->
-        <section id="inflation-section" class="glass-card rounded-2xl p-6 shadow-xl border-t-4 border-t-amber-500">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        <section id="inflation-section" class="glass-card rounded-2xl p-4 sm:p-6 shadow-xl border-t-4 border-t-amber-500">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 sm:gap-4 mb-5 sm:mb-6">
                 <div>
-                    <h2 class="text-lg font-semibold text-white flex items-center gap-2">
+                    <h2 class="text-base sm:text-lg font-semibold text-white flex items-center gap-2">
                         <i class="fa-solid fa-chart-line text-amber-400"></i>
                         เปรียบเทียบราคาตั้งขายเมื่อเงิน M เฟ้อ (Old Rate vs New Rate)
                     </h2>
-                    <p class="text-sm text-slate-400">เมื่อเรท M ในตลาดลดลง ต้องปรับราคาขายในเกมเพิ่มขึ้นกี่สลึง/กี่ M เพื่อให้ได้เงินจริงเท่าเดิม</p>
+                    <p class="text-xs sm:text-sm text-slate-400 mt-0.5">เมื่อเรท M ในตลาดลดลง ต้องปรับราคาขายในเกมเพิ่มขึ้นกี่สลึง/กี่ M เพื่อให้ได้เงินจริงเท่าเดิม</p>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 items-center">
                 <!-- Inputs -->
-                <div class="space-y-4 bg-slate-900/60 p-4 rounded-xl border border-slate-800">
+                <div class="space-y-3 sm:space-y-4 bg-slate-900/60 p-3.5 sm:p-4 rounded-xl border border-slate-800">
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">ราคาเงินจริงของไอเทม (บาท)</label>
                         <input type="number" id="compareThbInput" value="10" min="0" step="any"
@@ -673,18 +695,18 @@
                 </div>
 
                 <!-- Comparison Cards -->
-                <div class="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <!-- Old Price Box -->
-                    <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
+                    <div class="p-3.5 sm:p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-1.5 sm:space-y-2">
                         <div class="text-xs text-slate-400 font-medium">ราคาเดิมในเกม (เรท <span id="dispOldRateText">25</span> บาท)</div>
-                        <div class="text-xl font-bold text-slate-200" id="oldPriceUnits">400,000 สลึง</div>
+                        <div class="text-lg sm:text-xl font-bold text-slate-200" id="oldPriceUnits">400,000 สลึง</div>
                         <div class="text-sm font-semibold text-amber-400" id="oldPriceM">0.40 M</div>
                     </div>
 
                     <!-- New Price Box -->
-                    <div class="p-4 rounded-xl bg-amber-950/30 border border-amber-500/40 space-y-2 relative overflow-hidden">
+                    <div class="p-3.5 sm:p-4 rounded-xl bg-amber-950/30 border border-amber-500/40 space-y-1.5 sm:space-y-2 relative overflow-hidden">
                         <div class="text-xs text-amber-300 font-medium">ราคาใหม่ที่ต้องปรับขึ้น (เรท <span id="dispNewRateText">20</span> บาท)</div>
-                        <div class="text-xl font-bold text-emerald-400" id="newPriceUnits">500,000 สลึง</div>
+                        <div class="text-lg sm:text-xl font-bold text-emerald-400" id="newPriceUnits">500,000 สลึง</div>
                         <div class="text-sm font-semibold text-emerald-300" id="newPriceM">0.50 M</div>
                         
                         <div class="mt-2 pt-2 border-t border-amber-500/30 flex items-center justify-between text-xs">
@@ -697,28 +719,28 @@
         </section>
 
         <!-- SECTION 4: DYNAMIC PRICE REFERENCE TABLE -->
-        <section id="reference-table-section" class="glass-card rounded-2xl p-6 shadow-xl">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <section id="reference-table-section" class="glass-card rounded-2xl p-4 sm:p-6 shadow-xl">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 mb-4 sm:mb-6">
                 <div>
-                    <h2 class="text-lg font-semibold text-white flex items-center gap-2">
+                    <h2 class="text-base sm:text-lg font-semibold text-white flex items-center gap-2">
                         <i class="fa-solid fa-table-list text-emerald-400"></i>
                         ตารางอ้างอิงการตั้งราคาขายในโยกัง (เทียบราคาเงินจริง)
                     </h2>
-                    <p class="text-sm text-slate-400">คำนวณอัตโนมัติตามเรทปัจจุบัน: <span class="text-amber-400 font-semibold" id="tableRateNotice">1M = 25 บาท</span></p>
+                    <p class="text-xs sm:text-sm text-slate-400 mt-0.5">คำนวณอัตโนมัติตามเรทปัจจุบัน: <span class="text-amber-400 font-semibold" id="tableRateNotice">1M = 25 บาท</span></p>
                 </div>
-                <div class="text-xs bg-slate-900 px-3 py-2 rounded-lg border border-slate-800 text-slate-400">
+                <div class="text-xs bg-slate-900 px-3 py-2 rounded-lg border border-slate-800 text-slate-400 shrink-0">
                     <i class="fa-solid fa-lightbulb text-amber-400 mr-1"></i> ใช้ดูเรทราคากลางสำหรับตั้งร้านในเกมได้ทันที
                 </div>
             </div>
 
-            <div class="overflow-x-auto rounded-xl border border-slate-800">
-                <table class="w-full text-left text-sm text-slate-300">
-                    <thead class="bg-slate-900/90 text-xs uppercase text-slate-400 border-b border-slate-800">
+            <div class="overflow-x-auto rounded-xl border border-slate-800 -mx-1 sm:mx-0">
+                <table class="w-full text-left text-xs sm:text-sm text-slate-300 min-w-[540px] sm:min-w-full">
+                    <thead class="bg-slate-900/90 text-[11px] sm:text-xs uppercase text-slate-400 border-b border-slate-800">
                         <tr>
-                            <th scope="col" class="py-3.5 px-6 font-semibold">ราคาเงินจริง (บาท)</th>
-                            <th scope="col" class="py-3.5 px-6 font-semibold">ราคาในเกม (สลึง)</th>
-                            <th scope="col" class="py-3.5 px-6 font-semibold">ราคาในเกม (หน่วย M)</th>
-                            <th scope="col" class="py-3.5 px-6 font-semibold text-right">ตัวอย่างไอเทมโยกังใกล้เคียง</th>
+                            <th scope="col" class="py-3 px-3 sm:px-6 font-semibold whitespace-nowrap">ราคาเงินจริง (บาท)</th>
+                            <th scope="col" class="py-3 px-3 sm:px-6 font-semibold whitespace-nowrap">ราคาในเกม (สลึง)</th>
+                            <th scope="col" class="py-3 px-3 sm:px-6 font-semibold whitespace-nowrap">ราคาในเกม (หน่วย M)</th>
+                            <th scope="col" class="py-3 px-3 sm:px-6 font-semibold text-right whitespace-nowrap">ตัวอย่างไอเทมโยกังใกล้เคียง</th>
                         </tr>
                     </thead>
                     <tbody id="quickTableBody" class="divide-y divide-slate-800/60 bg-slate-900/40">
@@ -728,10 +750,17 @@
             </div>
         </section>
 
+        <!-- Floating Back to Top Button -->
+        <button id="backToTopBtn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})"
+            aria-label="กลับสู่ด้านบน"
+            class="fixed bottom-5 right-5 z-40 bg-amber-500/90 hover:bg-amber-500 text-slate-950 w-11 h-11 rounded-full shadow-lg border border-amber-400/50 transition-all duration-300 opacity-0 pointer-events-none translate-y-3 active:scale-90 flex items-center justify-center">
+            <i class="fa-solid fa-arrow-up text-sm font-bold"></i>
+        </button>
+
     </main>
 
     <!-- Footer -->
-    <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 text-center text-xs text-slate-500 space-y-1">
+    <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10 sm:mt-12 mb-6 sm:mb-8 text-center text-xs text-slate-500 space-y-1">
         <p>ระบบคำนวณและเทียบราคาเงิน M เกมโยกัง (Yulgang Online Currency & Inflation Converter)</p>
         <p>พัฒนาขึ้นเพื่อความสะดวกของพ่อค้าและผู้เล่นโยกังในการตั้งราคาขายไอเทม</p>
     </footer>
@@ -1098,6 +1127,20 @@
                 updateHonorBuyCalc();
             });
             document.getElementById('honorBuyThb').addEventListener('input', updateHonorBuyCalc);
+
+            // Back to Top button show/hide on scroll
+            const backToTopBtn = document.getElementById('backToTopBtn');
+            if (backToTopBtn) {
+                window.addEventListener('scroll', function() {
+                    if (window.scrollY > 300) {
+                        backToTopBtn.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-3');
+                        backToTopBtn.classList.add('opacity-100', 'translate-y-0');
+                    } else {
+                        backToTopBtn.classList.add('opacity-0', 'pointer-events-none', 'translate-y-3');
+                        backToTopBtn.classList.remove('opacity-100', 'translate-y-0');
+                    }
+                }, { passive: true });
+            }
 
             // Initial calculation run
             updateAllCalculations();
